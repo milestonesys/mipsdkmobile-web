@@ -1,0 +1,29 @@
+html, body {
+    _background: #1e1e1e;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+    font-family: Open Sans, Arial, Helvetica;
+    font-size: 15px;
+    font-weight: lighter;
+    color: #ffffff;
+}
+
+.camera img{
+    display: none;
+}
+.camera video{
+    display: none;
+}
+.camera.playing {
+    background: #000000 url('../../lib/images/playForwards.svg') no-repeat center center;
+}
+
+.bottombar .playbackBarButtons .playBackButton {
+    display: inline-block;
+    background-image: url(../../lib/images/playBackwards.svg);
+    background-size: auto 20px;
+    float: left;
+}

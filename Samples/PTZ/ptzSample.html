@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PTZ Sample</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="../lib/css/sample.css">
+        <link rel="stylesheet" type="text/css" href="css/sample.css">
+    </head>
+    <body>
+        <section id="login-form-container"></section>
+
+        <section id="streams-container"></section>
+
+        <div class="tmpl_ptzManualButtonsOverlay manualButtonsOverlay">
+            <div class="ptz-icon ptz-up" title="Move up"></div>
+            <div class="ptz-icon ptz-right" title="Move right"></div>
+            <div class="ptz-icon ptz-down" title="Move down"></div>
+            <div class="ptz-icon ptz-left" title="Move left"></div>
+
+            <div class="ptz-icon ptz-upRight" title="Move NE"></div>
+            <div class="ptz-icon ptz-upLeft" title="Move NW"></div>
+            <div class="ptz-icon ptz-downRight" title="Move SE"></div>
+            <div class="ptz-icon ptz-downLeft" title="Move SW"></div>
+
+            <div class="ptz-icon ptz-home" title="Move to Home"></div>
+
+            <div class="ptz-icon ptz-zoomIn" title="Zoom in"></div>
+            <div class="ptz-icon ptz-zoomOut" title="Zoom out"></div>
+        </div>
+
+        <div class="tmpl_ptzPresets">
+            <ul class="ptz-list"></ul>
+        </div>
+
+        <script src="../lib/js/sdkLoader.js"></script>
+        <script src="../lib/js/application.js"></script>
+        <script src="../lib/js/loginManager.js"></script>
+        <script src="js/ptzSample.js"></script>
+    </body>
+</html>

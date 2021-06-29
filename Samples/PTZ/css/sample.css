@@ -1,0 +1,124 @@
+.camera {
+    overflow: initial;
+}
+
+.camera video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.camera.playing.live .manualButtonsOverlay,
+.camera.playing.live .ptz-presets {
+    display: block;
+}
+
+.tmpl_ptzManualButtonsOverlay {
+    display: none;
+}
+
+.manualButtonsOverlay {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    bottom: 45px;
+    left: 0;
+}
+
+.ptz-icon {
+	position: absolute;
+	width: 34px;
+	height: 34px;
+	background-color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+.ptz-icon:before {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: transparent url("../images/ptzArrowUp.svg") center center/15px 15px no-repeat;
+}
+
+.ptz-left {
+	top: 50%;
+	left: 5px;
+	margin-top: -17px;
+    transform: rotate(-90deg);
+}
+.ptz-right {
+	top: 50%;
+	right: 5px;
+	margin-top: -17px;
+    transform: rotate(90deg);
+}
+.ptz-up {
+	top: 5px;
+	left: 50%;
+	margin-left: -17px;
+}
+.ptz-down {
+	bottom: 5px;
+	left: 50%;
+	margin-left: -17px;
+    transform: rotate(180deg);
+}
+
+.ptz-upRight {
+	top: 5px;
+	right: 8px;
+    transform: rotate(45deg);
+}
+.ptz-upLeft {
+	top: 5px;
+	left: 8px;
+    transform: rotate(-45deg);
+}
+.ptz-downRight {
+	bottom: 5px;
+	right: 8px;
+    transform: rotate(135deg);
+}
+.ptz-downLeft {
+	bottom: 5px;
+	left: 8px;
+    transform: rotate(-135deg);
+}
+
+.ptz-home {
+	top: 50%;
+	left: 50%;
+	margin: -17px 0 0 -17px;
+}
+.ptz-home:before {
+    margin: auto;
+	width: 20px;
+    height: 20px;
+    background: none;
+    border: 1px solid #fff;
+    border-radius: 50%;
+}
+
+.ptz-zoomIn {
+	right: 55px;
+	bottom: 5px;
+}
+.ptz-zoomIn:before {
+	background-image: url("../images/ptzZoomIn.svg");
+}
+
+.ptz-zoomOut {
+	right: 90px;
+	bottom: 5px;
+}
+.ptz-zoomOut:before {
+	background-image: url("../images/ptzZoomOut.svg");
+}
+
+.ptz-presets {
+    display: none;
+}

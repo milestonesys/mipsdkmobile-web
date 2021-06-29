@@ -1,0 +1,214 @@
+html {
+    min-width: 320px;
+    -ms-content-zooming: none;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    min-width: 320px;
+    background: #1e1e1e;
+    font-family: Open Sans, Arial, Helvetica;
+    font-size: 15px;
+    font-weight: lighter;
+    color: #ffffff;
+}
+
+.connect-form-content {
+    margin-bottom: 30px;
+}
+
+.display-none {
+    display: none;
+}
+
+.input {
+    padding: 5px 9px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.button {
+    padding: 5px 11px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.input:focus,
+.button:focus {
+    box-shadow: 0 0 7px 1px #3cf;
+    outline: none;
+}
+
+.label-text,
+.login-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.camera {
+    display: inline-block;
+    position: relative;
+    margin: 5px;
+    width: 400px;
+    height: 225px;
+    background: #000000 url("../../lib/images/playForwards.svg") no-repeat center center;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.camera h4{
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 3px;
+    background-color: #000000;
+    color: #ffffff;
+    opacity: 0.7;
+    width: calc(100% - 6px);
+}
+
+.camera.audio-playing {
+    background-image: url("../../lib/images/pause.svg");
+}
+.camera canvas {
+    width: 400px;
+    height: 225px;
+}
+
+.camera-name {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    margin: 0;
+    padding: 5px;
+    background-color: rgba(0,0,0,0.6);
+    opacity: 0.7;
+}
+
+/*******************/
+
+.bottombar {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    padding: 5px;
+    height: 34px;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: default;
+    -moz-transition: bottom 0.5s, padding 0.5s;
+    -webkit-transition: bottom 0.5s, padding 0.5s;
+    -o-transition: bottom 0.5s, padding 0.5s;
+    -ms-transition: bottom 0.5s, padding 0.5s;
+    transition: bottom 0.5s, padding 0.5s;
+    display: none;
+}
+
+.bottombar .btn {
+    width: 34px;
+    height: 34px;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    -moz-transition: width 0.5s, opacity 0.5s;
+    -webkit-transition: width 0.5s, opacity 0.5s;
+    -o-transition: width 0.5s, opacity 0.5s;
+    -ms-transition: width 0.5s, opacity 0.5s;
+    transition: width 0.5s, opacity 0.5s;
+}
+
+.bottombar .pauseButton {
+    position: relative;
+    float: left;
+    background-image: none;
+    z-index: 1;
+}
+                
+.bottombar .pauseButton:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: url(../../lib/images/arrowRight.svg) no-repeat center center transparent;
+    background-size: auto 17px;
+    opacity: 0.5;
+}
+
+.bottombar.onPause .pauseButton:after {
+    background: url(../../lib/images/arrowLeft.svg) no-repeat center center transparent;
+}
+
+.videoControls .bottombar .btn.pauseButton.hidden,
+.videoControls .bottombar .btn.pauseButton.featureDisabled {
+    display: block !important;
+    width: 34px !important;
+    opacity: 1 !important;
+}
+
+.bottombar .playbackBarButtons {
+    position: absolute;
+    white-space: nowrap;
+    left: 50%;
+    opacity: 1;
+    z-index: 0;
+    width: 50%;
+    -moz-transform: translate(-50%, 0);
+    -webkit-transform: translate(-50%, 0);
+    -o-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    -moz-transition: left 0.5s, opacity 0.5s;
+    -webkit-transition: left 0.5s, opacity 0.5s;
+    -o-transition: left 0.5s, opacity 0.5s;
+    -ms-transition: left 0.5s, opacity 0.5s;
+    transition: left 0.5s, opacity 0.5s;
+}
+
+.bottombar .playbackBarButtons .playForwardButton {
+    display: inline-block;
+    float: right;
+    background-image: url(../../lib/images/playForwards.svg);
+    background-size: auto 20px;
+}
+.bottombar .playbackBarButtons .playBackButton {
+    display: none;
+    float: left;
+    background-image: url(../../lib/images/playBackwards.svg);
+    background-size: auto 20px;
+}
+
+.bottombar .playbackBarButtons .playTimeIndex {
+    display: inline-block;
+    float: left;
+    width: auto;
+    height: 30px;
+    margin: 0 10px 0 41px;
+    font-size: 12px;
+    line-height: 30px;
+    vertical-align: top;
+    color: white;
+}
+
+.bottombar .playbackBarButtons .playBackButton.active,
+.bottombar .playbackBarButtons .playForwardButton.active {
+    background-image: url(../../lib/images/pause.svg);
+    background-size: 17px auto;
+}
+
+.ptt {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    height: 30px;
+}
+
+.ptt.recording {
+    background-color: azure;
+}

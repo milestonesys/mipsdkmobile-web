@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Video Push Sample</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="../lib/css/sample.css">
+    </head>
+    <body>
+        <section id="login-form-container"></section>
+        
+        <div>
+            <div>
+                <p>Start the video push camera.</p>
+                <p>You will see a canvas created only for the purposes of this demo.</p>
+                <p>It is the source we push to the server.</p>
+                <p>Click the "Toggle Video Push" button.</p>
+            </div>
+            <div>
+                <button id="toggle-video-push-button" style="display: none;">Toggle Video Push</button>
+            </div>
+            <canvas width="400" height="225" id="push-canvas"></canvas>
+        </div>
+
+        <section id="streams-container"></section>
+
+        <script src="../lib/js/sdkLoader.js"></script>
+        <script src="../lib/js/application.js"></script>
+        <script src="../lib/js/loginManager.js"></script>
+        <script src="js/videoPushSample.js"></script>
+    </body>
+</html>

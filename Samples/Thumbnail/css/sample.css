@@ -1,0 +1,33 @@
+.camera {
+    background: none;
+    border: none;
+}
+
+.camera video,
+.pauseButton,
+.bottombar .playbackBarButtons .playForwardButton {
+    display: none;
+}
+
+.bottombar {
+    display: block;
+}
+
+.cloak {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 1px solid #ccc;
+    z-index: 10;
+    cursor: default;
+}
+
+.get-thumbnail-button {
+    position: absolute;
+    bottom: 11px;
+    right: 10px;
+    z-index: 12;
+    cursor: pointer;
+}
