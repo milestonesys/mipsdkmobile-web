@@ -22,7 +22,11 @@ body {
     display: none;
 }
 
-.input {
+.error-text {
+    color: red;
+}
+
+.input, .select {
     padding: 5px 9px;
     border: 1px solid #ccc;
     border-radius: 3px;

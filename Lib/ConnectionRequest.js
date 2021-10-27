@@ -176,7 +176,7 @@
             for (key in params) {
                 var createProperty = function (key, value) {
                     value = (value !== undefined && value.toString) ? value.toString() : '';
-                    value = value.replace('"', '\"');
+                    value = value.replaceAll('&', '&amp;').replace(/(\r\n|\r|\n)/g, '&#10;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
                     return '<Param Name="' + key + '" Value="' + value + '" />';
                 };
                 if (params[key] !== undefined && params[key] instanceof Array) {

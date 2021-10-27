@@ -14,6 +14,15 @@
     </div>
     <div class="login-form-content display-none">
         <label>
+            <span class="label-text">
+                Authentication
+            </span>
+            <select name="authentication" id="authentication" class="select">
+                <option value="ActiveDirectory">Windows Authentication</option>
+                <option value="Basic">Basic Authentication</option>
+            </select>
+        </label>
+        <label>
             <span class="label-text">Username</span>
             <input type="text" class="username input" name="username" placeholder="Username" />
         </label>
@@ -21,6 +30,9 @@
             <span class="label-text">Password</span>
             <input type="password" class="password input" name="password" placeholder="Password" />
         </label>
+        <p class="error-text display-none">
+            Incorrect user name or password.
+        </p>
         <div>
             <button type="button" class="login-button button">Connect</button>
         </div>

@@ -31,6 +31,7 @@ class VideoStream extends HTMLElement {
         this.numberOfStreamRestarts = 0;
         this.clearNumberOfRestarts = null;
         this.status = 'created';
+        this.videoStuck = false;
     }
 
     get cameraId() {
@@ -134,11 +135,15 @@ class VideoStream extends HTMLElement {
     }
 
     onBeginVideoStuck(videoId) {
+        this.videoStuck = true;
         this.dispatchEvent(new CustomEvent('beginVideoStuck', { detail: { cameraId: this.cameraId,videoId: videoId } }));
     }
 
     onEndVideoStuck(videoId) {
-        this.dispatchEvent(new CustomEvent('endVideoStuck', { detail: { cameraId: this.cameraId,videoId: videoId  } }));
+        if (this.videoStuck) {
+            this.videoStuck = false;
+            this.dispatchEvent(new CustomEvent('endVideoStuck', { detail: { cameraId: this.cameraId, videoId: videoId } }));
+        }
     }
 
     onStreamReady(videoConnection) {
@@ -152,6 +157,7 @@ class VideoStream extends HTMLElement {
     onFallback(msg) {
         if (this.status !== 'destroyed') {
             this.status = 'fallback';
+            this.videoStuck = false;
             this.dispatchEvent(new CustomEvent('fallback', { detail: { message: msg } }));
         }
     }
@@ -169,6 +175,7 @@ class VideoStream extends HTMLElement {
     }
 
     onRestartStream(videoConnection) {
+        this.videoStuck = false;
         this.dispatchEvent(new CustomEvent('restartStream', { connection: videoConnection }));
     }
 
@@ -179,6 +186,7 @@ class VideoStream extends HTMLElement {
         }
         
         this.numberOfStreamRestarts++;
+        this.videoStuck = false;
         let videoConnection = this.stream.videoConnection;
         this.stream && this.stream.destroy(true);
         this.stream = null;

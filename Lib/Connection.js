@@ -1571,9 +1571,12 @@ Connection = function() {
 			SeqType: 'Recording',
 			Time: startTime,
 			AfterTime: parseInt((endTime - startTime) / 1000),
-			AfterCount: 10000,
-			InvestigationId: investigationId
+			AfterCount: 10000
 		};
+
+		if (investigationId) {
+			params.InvestigationId = investigationId;
+        }
 
 		// debuger.getSequences(params);
 		return self.sendCommand('GetSequences', params, { successCallback: successCallback }, getSequencesInIntervalCallback, failCallback);
@@ -2373,6 +2376,64 @@ Connection = function() {
 			connectionRequest.options.successCallback && connectionRequest.options.successCallback();
 		});
 	};
+
+	/**
+	 * Get bookmarks from server.
+	 *
+	 * @param {Object} params: Parameters to sent to the server
+	 * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	this.getBookmarks = function (params, successCallback, failCallback) {
+
+		var data = {
+			MyBookmarks: params.MyBookmarks || 'No',
+			BookmarkId: params.BookmarkId,
+		};
+
+		if (params.Count) {
+			data['Count'] = params.Count
+		}
+
+		return self.sendCommand('GetBookmarks', data, { successCallback: successCallback }, getBookmarksCallback, failCallback);
+	};
+
+	/**
+	 * Called when GetAlarmList reponse is received
+	 * 
+	 * @param 		connectionRequest		object		Response from AXAJ call
+	 */
+	var getBookmarksCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error getting bookmarks', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
+		});
+	};
+
+	/**
+	 * Deletes bookmark by id. 
+	 * 
+	 * @method deleteBookmark
+	 * @param {String} id: the unique id of the bookmark.
+	 * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	this.deleteBookmark = function (id, successCallback, failCallback) {
+
+		var params = {
+			BookmarkId: id
+		};
+
+		return self.sendCommand('DeleteBookmark', params, { successCallback: successCallback }, deleteBookmarkCallback, failCallback);
+	};
+
+	/**
+	 * Called after deleteBookmark response is returned.
+	 */
+	var deleteBookmarkCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error deleting bookmark.', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback();
+		});
+	};
 	
 	/**
 	 * Request the next camera for the given carousel.
@@ -2469,6 +2530,37 @@ Connection = function() {
 	        connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
 	    });
 	};
+
+	this.CreateBookmark = function (params, successCallback, failCallback) {
+		return self.sendCommand('CreateBookmark', params, { successCallback: successCallback }, createBookmarkCallback, failCallback);
+	};
+
+	var createBookmarkCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error creating a bookmark.', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
+		});
+	};
+
+	this.RequestBookmarkCreation = function (params, successCallback, failCallback) {
+		return self.sendCommand('RequestBookmarkCreation', params, { successCallback: successCallback }, requestBookmarkCreationCallback, failCallback);
+	};
+
+	var requestBookmarkCreationCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error requesting a bookmark.', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.outputParameters);
+		});
+	};
+
+	this.UpdateBookmark = function (params, successCallback, failCallback) {
+		return self.sendCommand('UpdateBookmark', params, { successCallback: successCallback }, updateBookmarkCallback, failCallback);
+	};
+
+	var updateBookmarkCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error update a bookmark.', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
+		});
+	};
+
 
 	/**
 	 * A general callback to be called after a request operation. 

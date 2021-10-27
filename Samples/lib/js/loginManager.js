@@ -6,6 +6,7 @@
         self.streamsContainer;
         self.loginFormShown;
         self.connectionDidLogIn;
+        self.connectionFailedToLogIn;
         self.credentials;
 
         var connectForm,
@@ -36,7 +37,8 @@
 
             lastObserver = {
                 connectionDidConnect: connectionDidConnect,
-                connectionDidLogIn: self.connectionDidLogIn
+                connectionDidLogIn: self.connectionDidLogIn,
+                connectionFailedToLogIn: self.connectionFailedToLogIn
             };
 
             XPMobileSDK.addObserver(lastObserver);
@@ -44,8 +46,8 @@
             XPMobileSDK.connect(url);
         }
 
-        function loginCommand(username, password) {
-            XPMobileSDK.login(username, password, null, {
+        function loginCommand(username, password, loginType = null) {
+            XPMobileSDK.login(username, password, loginType, {
                 SupportsAudioIn: 'Yes',
                 SupportsAudioOut: 'Yes'
             });
@@ -54,12 +56,10 @@
         function login() {
             // Login with the provided credentials
             var username = findInner('.username').value,
-            password = findInner('.password').value;
+                password = findInner('.password').value,
+                loginType = findInner("#authentication").value;
 
-            loginCommand(username, password);
-
-            connectForm.classList.add('display-none');
-            loginForm.classList.add('display-none');
+            loginCommand(username, password, loginType);
         }
 
         function toggleLoginFormHandler() {
@@ -135,7 +135,12 @@
             self.streamsContainer = settings.streamsContainer || {};
             self.loginFormShown = settings.loginFormShown || function () { };
             self.connectionDidLogIn = settings.connectionDidLogIn || function () { };
+            self.connectionFailedToLogIn = settings.connectionFailedToLogIn || function () { };
             self.credentials = settings.credentials;
+        }
+
+        function showLoginErrorMessage() {
+            document.getElementsByClassName('error-text')[0].classList.remove('display-none');
         }
 
         function init() {
@@ -143,7 +148,7 @@
 
             if (self.credentials) {
                 connectionDidConnect = function () {
-                    loginCommand(self.credentials.user, self.credentials.pass);
+                    loginCommand(self.credentials.user, self.credentials.pass, self.credentials.type);
                 };
 
                 setTimeout(connectToServer, 800);
@@ -157,12 +162,17 @@
         function destroy() {
             var container = document.getElementById('login-form-container');
 
+            connectForm.classList.add('display-none');
+            loginForm.classList.add('display-none');
+            document.getElementsByClassName('error-text')[0].classList.add('display-none');
+
             container.parentNode.removeChild(container);
         }
 
         return {
             init: init,
-            destroy: destroy
+            destroy: destroy,
+            showLoginErrorMessage: showLoginErrorMessage
         };
     };
 
@@ -174,7 +184,8 @@
             if (!!params.user && !!params.pass) {
                 credentials = {
                     user: params.user,
-                    pass: params.pass
+                    pass: params.pass,
+                    type: params.type || null
                 };
             }
 
@@ -191,6 +202,9 @@
                     loginManager.destroy();
 
                     params.connectionDidLogIn();
+                },
+                connectionFailedToLogIn: function () {
+                    loginManager.showLoginErrorMessage();
                 }
             });
 

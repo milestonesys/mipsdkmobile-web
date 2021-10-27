@@ -185,12 +185,17 @@ var XPMobileSDK = new function () {
 	this.getAlarmDataSettings = getAlarmDataSettings;
 	this.getAlarmUsers = getAlarmUsers;
 	this.acknowledgeAlarm = acknowledgeAlarm;
+	this.getBookmarks = getBookmarks;
+	this.deleteBookmark = deleteBookmark;
 	this.prevCarouselCamera = prevCarouselCamera;
 	this.nextCarouselCamera = nextCarouselCamera;
 	this.pauseCarousel = pauseCarousel;
 	this.resumeCarousel = resumeCarousel;
 	this.registerForNotifications = registerForNotifications;
 	this.RegisterForNotifications = RegisterForNotifications;
+	this.CreateBookmark = CreateBookmark;
+	this.UpdateBookmark = UpdateBookmark;
+	this.RequestBookmarkCreation = RequestBookmarkCreation;
 	this.getResamplingFactor = getResamplingFactor;
     this.toggleDirectStreaming = toggleDirectStreaming;
 	this.toggleDiagnosticsOverlay = toggleDiagnosticsOverlay;
@@ -1735,6 +1740,39 @@ var XPMobileSDK = new function () {
 	    return XPMobileSDK.library.Connection.acknowledgeAlarm(alarmId, successCallback, errorCallback);
 	}
 
+	/**
+	 * Gets a list of bookmarks
+	 * 
+	 * @method getBookmarksList
+	 * @param {Object} parameters - Object containing the following properties:
+	 * <pre>
+	 * - {String} MyBookmarks - YES/NO - flag whether to send only my Bookmarks
+	 * - {Number} Timestamp - Target time
+	 * - {Number} Count - Max bookmarks count to return
+	 * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 * 
+	 * @return {ConnectionRequest} - the ConnectionRequest object
+	 */
+	function getBookmarks(parameters, successCallback, errorCallback) {
+		return XPMobileSDK.library.Connection.getBookmarks(parameters, successCallback, errorCallback);
+	}
+
+	/**
+	 * Delete a bookmark by given ID (GUID)
+	 * 
+	 * @method deleteBookmark
+	 * @param {String} id - Id of a bookmark (GUID)
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 * 
+	 * @return {ConnectionRequest} - the ConnectionRequest object
+	 */
+	function deleteBookmark(id, successCallback, errorCallback) {
+		return XPMobileSDK.library.Connection.deleteBookmark(id, successCallback, errorCallback);
+	}
+
     /**
 	 * Request the prev camera for the given carousel.
 	 * 
@@ -1861,6 +1899,63 @@ var XPMobileSDK = new function () {
 	function RegisterForNotifications(params, successCallback, errorCallback) {
 	    XPMobileSDK.library.Connection.RegisterForNotifications(params, successCallback, errorCallback);
 	}
+
+    /**
+     * Create a bookmark for the specific device
+     * 
+     * @method CreateBookmark
+     * @param {Object} params - Parameters for the server. Can contain:
+     * <pre>
+	 * - {String} VideoID (optional) - Id of the stream to bookmark (Guid), If it's not provided, CameraId, Name and Time are considered mandatory.
+	 * - {String} CameraId (mandatory) - Id of the camera to bookmark (Guid).
+     * - {String} Name (mandatory) - Name of the bookmark
+     * - {String} Description (optional) - Bookmark description. "Mobile bookmark" will be used if input param is empty.
+	 * - {String} Time (mandatory) - Exact time of the bookmark (milliseconds since Unix epoch).
+	 * - {String} StartTime (optional) - Start time of the bookmark (milliseconds since Unix epoch).
+	 * - {String} EndTime (optional) - End time of the bookmark (milliseconds since Unix epoch).
+     * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	function CreateBookmark(params, successCallback, errorCallback) {
+		XPMobileSDK.library.Connection.CreateBookmark(params, successCallback, errorCallback);
+	}
+
+	/**
+	 * Update a bookmark for the specific device
+	 * 
+	 * @method UpdateBookmark
+	 * @param {Object} params - Parameters for the server. Can contain:
+	 * <pre>
+	 * - {String} BookmarkId (mandatory) - Id of an existing bookmark which is to be modified (Guid).
+	 * - {String} Name (optional) - Name of the bookmark
+	 * - {String} Description (optional) - Bookmark description. "Mobile bookmark" will be used if input param is empty.
+	 * - {String} Time (optional) - Exact time of the bookmark (milliseconds since Unix epoch).
+	 * - {String} StartTime (optional) - Start time of the bookmark (milliseconds since Unix epoch).
+	 * - {String} EndTime (optional) - End time of the bookmark (milliseconds since Unix epoch).
+	 * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	function UpdateBookmark(params, successCallback, errorCallback) {
+		XPMobileSDK.library.Connection.UpdateBookmark(params, successCallback, errorCallback);
+	}
+
+	/**
+     * Get information about bookmark like pre/post time and reserve reference for its creation which can be used after that
+     * 
+     * @method RequestBookmarkCreation
+     * @param {Object} params - Parameters for the server. Can contain:
+     * <pre>
+	 * - {String} CameraId - Id of the camera to bookmark (Guid).
+     * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	function RequestBookmarkCreation(params, successCallback, errorCallback) {
+		XPMobileSDK.library.Connection.RequestBookmarkCreation(params, successCallback, errorCallback);
+	}
+	
 
     /**
 	 * Sends requests to the server. Creates ConnectionRequest instances. 
