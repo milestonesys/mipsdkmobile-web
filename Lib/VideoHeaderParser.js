@@ -51,6 +51,7 @@
             self.hasLocationData = MainHeader & XPMobileSDK.library.ItemHeaderParser.HeaderExtensionLocationInfo;
             self.hasStreamInfo = MainHeader & XPMobileSDK.library.ItemHeaderParser.HeaderExtensionStreamInfo;
             self.hasCarouselInfo = MainHeader & XPMobileSDK.library.ItemHeaderParser.HeaderExtensionCarouselInfo;
+            self.hasPlaybackInfo = MainHeader & XPMobileSDK.library.ItemHeaderParser.HeaderExtensionPlaybackInfo;
             
             if (self.hasSizeInformation) {
                 self.parseSizeInformation();
@@ -76,6 +77,9 @@
             }
             if (self.hasCarouselInfo) {
                 self.parseCarouselInfo();
+            }
+            if (self.hasPlaybackInfo) {
+                self.parsePlaybackInfo();
             }
         }
 

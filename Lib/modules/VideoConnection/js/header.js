@@ -35,6 +35,7 @@ export default class VideoFrame {
         this.hasLocationData = MainHeader & FrameHeaders.HeaderExtensionLocationInfo;
         this.hasStreamInfo = MainHeader & FrameHeaders.HeaderExtensionStreamInfo;
         this.hasCarouselInfo = MainHeader & FrameHeaders.HeaderExtensionCarouselInfo;
+        this.hasPlaybackInfo = MainHeader & FrameHeaders.HeaderExtensionPlaybackInfo
 
         if (this.hasSizeInformation) {
             this.parseSizeInformation();
@@ -60,6 +61,9 @@ export default class VideoFrame {
         }
         if (this.hasCarouselInfo) {
             this.parseCarouselInfo();
+        }
+        if (this.hasPlaybackInfo) {
+            this.parsePlaybackInfo();
         }
     }
 
@@ -212,6 +216,15 @@ export default class VideoFrame {
     parsePlaybackInformation() {
         this.currentPlaybackEvents = this.readBytes(4);
         this.changedPlaybackEvents = this.readBytes(4);
+    }
+
+    /**
+    * Get playback info 
+    */
+    parsePlaybackInfo() {
+        this.requestedTimeStampUtcMs = this.readBytes(8);
+        this.readBytes(4);
+        this.readBytes(4);
     }
 
     /**

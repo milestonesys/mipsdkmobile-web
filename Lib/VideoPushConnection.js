@@ -43,7 +43,7 @@ XPMobileSDK.library.VideoPushConnection = function (successCallback, errorCallba
 				navigator.getUserMedia({ video: true, audio: false }, onSuccess, onError);
 			}
 			else {
-				console.warn("Video push not supported!");
+				logger.warn("Video push not supported!");
 			}				
 		}
 		
@@ -54,7 +54,7 @@ XPMobileSDK.library.VideoPushConnection = function (successCallback, errorCallba
 		}
 		
 		function onError(error) {
-		    console.error(error.name);
+		    logger.error(error.name);
 			callbacks.onError(error);	
 		}
 	}
@@ -140,7 +140,7 @@ XPMobileSDK.library.VideoPushConnection = function (successCallback, errorCallba
 	function onAjaxSuccess(request) {}
 	
 	function onAjaxFailure(request) {
-		console.error('ERROR in ajax request for video push with videoId ' + stream.videoId);		
+		logger.error('ERROR in ajax request for video push with videoId ' + stream.videoId);		
 	}
 	
 	function destroy() {

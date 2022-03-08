@@ -121,14 +121,15 @@ XPMobileSDK.library.CHAP = {
 					this.unHaltSystem();
                 }
 
-				if (challenge.isValid()) {
+            if (challenge.isValid()) {
+              logger.log('Challenge:' + challenge.getValue(), 'Seconds until expire:' + challenge.ttl);
 	                return challenge;
 	            }
 				challenge.destroy();
 	        }
 	    }
 	    else {
-	        console.warn('No challenges in the list!');
+	        logger.warn('No challenges in the list!');
 	        return {getValue: function(){}, getTime: function(){}};
 	    }
 	},

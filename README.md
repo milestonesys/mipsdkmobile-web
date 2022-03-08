@@ -1,4 +1,4 @@
-﻿---
+---
 description: This repo contains samples that demonstrate MIP SDK Mobile Mobile Web (JavaScript) integration.
 keywords:
 - MIP SDK Mobile

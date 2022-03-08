@@ -29,8 +29,8 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 	var CommunicationNode = xmlDoc.getElementsByTagName('Communication')[0];
 	var CommandNode = CommunicationNode.getElementsByTagName('Command')[0];
 	var TypeNode = CommandNode.getElementsByTagName('Type')[0];
-	if (XMLNodeTextContent(TypeNode) == 'Processing') {
-		console.log('Processing...');
+  if (XMLNodeTextContent(TypeNode) == 'Processing') {
+    logger.log('Processing...');
 		self.isProcessing = true;
 	} else if (XMLNodeTextContent(TypeNode) == 'Response') {
 		self.isResponse = true;
@@ -137,7 +137,7 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 
             var commandNameNode = CommandNode.getElementsByTagName('Name');
             if (commandNameNode.length > 0 && XMLNodeTextContent(commandNameNode[0]) !== "CloseStream") {
-                console.error('Response error ' + (self.errorString || getError(self.errorCode)) + ' ' + (self.errorCode || '') + ' Complete response: ' + xmlString);
+                logger.error('Response error ' + (self.errorString || getError(self.errorCode)) + ' ' + (self.errorCode || '') + ' Complete response: ' + xmlString);
             }
 		}
 	}

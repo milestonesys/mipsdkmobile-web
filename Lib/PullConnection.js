@@ -89,7 +89,7 @@ XPMobileSDK.library.PullConnection = function(videoURL, options) {
 			self.ajaxRequestTimeout = setTimeout(function () {
 				if (!ajaxRequest) return;
 				
-				console.warn('aborting video request for ' + self.videoId);
+				logger.warn('aborting video request for ' + self.videoId);
 				ajaxRequest.onreadystatechange = function () {};
 				ajaxRequest.abort();
 				XPMobileSDK.library.Ajax.activeRequestCount--;
@@ -149,8 +149,8 @@ XPMobileSDK.library.PullConnection = function(videoURL, options) {
 				lastFrame = currentData;
 			} 
 			catch (e) {
-				console.error('Exception in video connection ajax response', e);
-				console.error(e.stack);
+				logger.error('Exception in video connection ajax response', e);
+				logger.error(e.stack);
 				
 				callMethodOnObservers('onHTTPError', ajaxRequest);
 			}
@@ -158,7 +158,7 @@ XPMobileSDK.library.PullConnection = function(videoURL, options) {
 	};
 	
 	function onAjaxFailure (request) {
-		console.error('ERROR in ajax request for frame for video channel ' + videoURL);
+		logger.error('ERROR in ajax request for frame for video channel ' + videoURL);
 		callMethodOnObservers('onHTTPError', request);
 	};
 	

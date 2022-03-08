@@ -275,7 +275,7 @@ Connection = function() {
 	this.removeObserver = function (object) {
 		var index = observers.indexOf(object);
 		if (index < 0) {
-			console.error('Error removing observer. Observer does not exist.');
+			logger.error('Error removing observer. Observer does not exist.');
 			return;
 		}
 		observers.splice(index, 1);
@@ -288,7 +288,7 @@ Connection = function() {
 	 * @param {ConnectionRequest} connectionRequest
 	 */ 
 	this.cancelRequest = function (connectionRequest) {
-		console.log('Cancelling request: ', connectionRequest);
+		logger.log('Cancelling request: ', connectionRequest);
 		connectionRequest.cancel();
 		requestFinished(connectionRequest);
 	};
@@ -372,8 +372,8 @@ Connection = function() {
 			if (!!connectionResponse.outputParameters.ServerProductCode) {
 			    self.ServerProductCode = connectionResponse.outputParameters.ServerProductCode;
 			}
-			
-			console.info('Established connection');
+
+      logger.info('Established connection');
 			scheduleLiveMessage();
             var successResponseParameter = connectionResponse.outputParameters;
 			callMethodOnObservers('connectionDidConnect', successResponseParameter);
@@ -393,7 +393,7 @@ Connection = function() {
 		self.server = server;
 		self.connectionId = connectionId;
 		self.serverId = serverId;
-		console.log('Connecting with Id ' + self.connectionId);
+		logger.log('Connecting with Id ' + self.connectionId);
 		setState(XPMobileSDK.library.ConnectionStates.connecting);
 		// We need to check the connection ID we have been provided with the server. Easiest way is to just ping it
 		self.sendLiveMessage();
@@ -416,7 +416,7 @@ Connection = function() {
 	this.Login = function (params, successCallback, failCallback) {
 	    params = params || {};
 
-		console.log('Log in with authentication type ' + params.LoginType + ' username ' + params.Username + ' password ' + params.Password);
+		logger.log('Log in with authentication type ' + params.LoginType + ' username ' + params.Username + ' password ' + params.Password);
 	    setState(XPMobileSDK.library.ConnectionStates.loggingIn);
 	    return self.sendCommand('LogIn', params, { successCallback: successCallback }, loginCallback, failCallback);
 	};
@@ -459,7 +459,7 @@ Connection = function() {
 		self.exportToMkv = connectionResponse.outputParameters.ExportToMkv == 'Yes';
 		self.storage.setItem('exportToMkv', self.exportToMkv);
 
-		console.info('Logged in');
+    logger.info('Logged in');
 		getFeatures(connectionResponse.outputParameters);
 
 		setState(XPMobileSDK.library.ConnectionStates.working);
@@ -749,7 +749,7 @@ Connection = function() {
 		callbackAfterRequest(connectionRequest, 'Error starting stream for camera ' + connectionRequest.options.cameraId, function () {
 			
 			var videoId = connectionRequest.response.outputParameters.VideoId;
-			console.log('Server prepared video ID ' + videoId + ' for camera ' + connectionRequest.options.cameraId);
+			logger.log('Server prepared video ID ' + videoId + ' for camera ' + connectionRequest.options.cameraId);
 			
 			let videoConnection = new VideoStream(videoId, connectionRequest);
 			if (connectionRequest.options.reuseConnection) {
@@ -924,7 +924,7 @@ Connection = function() {
 	    callbackAfterRequest(connectionRequest, 'Error starting stream for microphone ' + connectionRequest.options.microphoneId, function () {
 	        
 	        var streamId = connectionRequest.response.outputParameters.StreamId;
-	        console.log('Server prepared stream ID ' + streamId + ' for microphone ' + connectionRequest.options.microphoneId);
+	        logger.log('Server prepared stream ID ' + streamId + ' for microphone ' + connectionRequest.options.microphoneId);
 
 	        connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest);
 	    });
@@ -1190,7 +1190,7 @@ Connection = function() {
 			decreasing = true;
 			current = current > stable ? stable : minFps;
 
-			console.warn('Decreasing FPS to ' + current);
+			logger.warn('Decreasing FPS to ' + current);
 			change(current, function () { decreasing = false; }.bind(this));
 			
 		}.bind(this);
@@ -1205,7 +1205,7 @@ Connection = function() {
 			increasing = true;
 			stable = current++;
 
-			console.warn('Increasing FPS to ' + current);
+			logger.warn('Increasing FPS to ' + current);
 			change(current, function () { increasing = false; }.bind(this));
 
 		}.bind(this);
@@ -2378,6 +2378,32 @@ Connection = function() {
 	};
 
 	/**
+	 * Gets a list of bookmarks. There are 3 valid usages of the command.
+	 * The first one is to provide Count in order to retrieve only the latest bookmarks.
+	 * The second one is to provide BookmarkId in order to retrieve a single bookmark.
+	 * And the last one is to get a list of bookmarks searching from specified bookmark - than BookmarkId and Count should be provided.
+	 *
+	 * @method GetBookmarks
+	 * @param {Object} params - Parameters to sent to the server.  May contain:
+	 * <pre>
+	 * - {String} BookmarkId - GUID of the Bookmark.
+	 *						   If specified along with Count, StartTime will be ignored and the Bookmark will be considered as a start time of the search interval.
+	 *						   If only BookmarkId is specified than single bookmark will be returned as a result
+	 * - {Number} Count - Maximum number of bookmarks to be returned in the result. If you want to retrieve a specific bookmark you should not specify the count, but provide the BookmarkId only.
+	 * - {String} StartTime - (Optional) Start time of the search interval. It specifies from where the search of bookmark will begin. If not specified current time will be considered as a start time.
+	 * - {String} EndTime - (Optional) End time of the search interval. If the EndTime is set before the StartTime than the bookmarks will be returned in reversed order again starting to search from StartTime to EndTime.
+	 * - {String} MyBookmarks - (Optional)YES/NO - flag whether to send only my Bookmarks
+	 * - {String} Keyword - (Optional)Search string to appear in either of the fields 'Reference', 'Header', 'Description'
+	 * - {String} SearchCameraIds - (Optional) Included cameras GUIDs in a comma separated string
+	 * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	this.GetBookmarks = function (params, successCallback, failCallback) {
+		return self.sendCommand('GetBookmarks', params, { successCallback: successCallback }, getBookmarksCallback, failCallback);
+	};
+
+	/**
 	 * Get bookmarks from server.
 	 *
 	 * @param {Object} params: Parameters to sent to the server
@@ -2392,7 +2418,23 @@ Connection = function() {
 		};
 
 		if (params.Count) {
-			data['Count'] = params.Count
+			data['Count'] = params.Count;
+		}
+
+		if (params.StartTime) {
+			data['StartTime'] = params.StartTime;
+		}
+
+		if (params.EndTime) {
+			data['EndTime'] = params.EndTime;
+		}
+
+		if (params.Keyword) {
+			data['Keyword'] = params.Keyword;
+		}
+
+		if (params.SearchCameraIds) {
+			data['SearchCameraIds'] = params.SearchCameraIds;
 		}
 
 		return self.sendCommand('GetBookmarks', data, { successCallback: successCallback }, getBookmarksCallback, failCallback);
@@ -2578,12 +2620,12 @@ Connection = function() {
 		
 		if (!connectionResponse || connectionResponse.isError) {
 			if (connectionRequestResponseIsTerminal(connectionRequest)) {
-				console.error("The application has lost connection due to connectionRequestResponseIsTerminal");
-				console.log(errorMessage);
+				logger.error("The application has lost connection due to connectionRequestResponseIsTerminal");
+				logger.log(errorMessage);
 				lostConnection();
 			}
 			else {
-				console.error(errorMessage);
+				logger.error(errorMessage);
 				
 				if (connectionRequest.options.failCallback) {
 				    connectionRequest.options.failCallback(connectionResponse.error, connectionResponse);
@@ -2624,7 +2666,7 @@ Connection = function() {
 				requestParams.Challenge = challenge.Challenge;
 				requestParams.ChalAnswer = challenge.ChalAnswer;
 			} else if (XPMobileSDK.library.Connection.state == XPMobileSDK.library.ConnectionStates.working) {
-				console.error('No challenges to perform the action');
+				logger.error('No challenges to perform the action');
 				return;
             }
 	    }
@@ -2634,7 +2676,7 @@ Connection = function() {
 	        options.failCallback = failCallback;
 	    }
 		
-	    console.log('Sending ' + commandName + ' on ' + (new Date()) + 'with ', requestParams);
+	    logger.log('Sending ' + commandName + ' on ' + (new Date()) + 'with ', requestParams);
 		
 	    var connectionRequest = new XPMobileSDK.library.ConnectionRequest(commandName, getNextSequenceID(), requestParams, options, successCallback);
 
@@ -2679,8 +2721,8 @@ Connection = function() {
 				try {
 					object[methodName].apply(object, args);
 				} catch (e) {
-					console.error(e);
-					console.log(e.stack);
+					logger.error(e);
+					logger.log(e.stack);
 				}
 			}
 		});
@@ -2796,7 +2838,7 @@ Connection = function() {
 			if (connectionRequestResponseIsTerminal(connectionRequest)) {
 				if (self.connectingViaExternalConnectionID) {
 					self.connectingViaExternalConnectionID = false;
-					console.warn('Old connection ID has expired');
+					logger.warn('Old connection ID has expired');
 					callMethodOnObservers('connectionFailedToConnectWithId', connectionResponse && connectionResponse.error);
 					self.connectionId = null;
 				} else {
@@ -2809,7 +2851,7 @@ Connection = function() {
 
 		if (self.connectingViaExternalConnectionID) {
 			self.connectingViaExternalConnectionID = false; // reset the flag
-			console.log('Started connection from external connection ID');
+			logger.log('Started connection from external connection ID');
 			setState(XPMobileSDK.library.ConnectionStates.working);
 			callMethodOnObservers('connectionDidLogIn'); // do we need another method?
 			callMethodOnObservers('connectionDidConnectWithId');

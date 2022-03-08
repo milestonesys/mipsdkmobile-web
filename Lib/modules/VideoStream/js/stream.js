@@ -1,4 +1,6 @@
-﻿import VideoElement from './video.js';
+'use strict';
+
+import VideoElement from './video.js';
 import FallbackController from './fallback.js';
 
 const destination = {};
@@ -95,7 +97,7 @@ export default class Stream {
                 try {
                     this.buffer.appendBuffer(this.queue.shift());
                 } catch (e) {
-                    console.log(e);
+                    logger.log(e);
                 }
             }
         } catch (e) {
@@ -216,7 +218,7 @@ export default class Stream {
 
         if (changed & XPMobileSDK.library.ItemHeaderParser.LiveFlags.CameraConnectionLost) {
             if (current & XPMobileSDK.library.ItemHeaderParser.LiveFlags.CameraConnectionLost) {
-                console.log('Camera connection lost');
+                logger.log('Camera connection lost');
                 this.onRestartStream();
             }
         }
@@ -243,7 +245,7 @@ export default class Stream {
 
     streamError(error, response) {
         this.requestStream = null;
-        console.log('requestStreamErrorCallback: ' + error.code);
+        logger.log('requestStreamErrorCallback: ' + error.code);
         this.onStreamError(error, response);
     }
 

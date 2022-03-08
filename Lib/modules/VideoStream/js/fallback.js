@@ -1,4 +1,6 @@
-﻿const MAX_RETRY_TIMEOUT = 10000; // in ms.
+'use strict';
+
+const MAX_RETRY_TIMEOUT = 10000; // in ms.
 const VIDEO_STUCK_CHECK_TIMEOUT = 2000; // in ms.
 const NO_VIDEO_TIMEOUT = 3000; // in ms.
 const VIDEO_PLAYER_STUCK_TIMEOUT = 5000; // in ms
@@ -31,7 +33,7 @@ export default class Fallback {
         this.noVideoTimeout = null;
         this.onStuckVideoPlayerTimeout = null;
 
-        SHOW_LOG && console.log('Fallback controller initilized');
+        SHOW_LOG && logger.log('Fallback controller initilized');
     }
 
     /**
@@ -43,7 +45,7 @@ export default class Fallback {
     addFragment(fragment) {
         this.lastFragment = fragment;
         this.lastFragmentReceiveTime = Date.now();
-        SHOW_LOG && console.log('Received fragment with size: ' + fragment.dataSize);
+        SHOW_LOG && logger.log('Received fragment with size: ' + fragment.dataSize);
         this.resetFragmentCountTimeout();
         this.videoPlayer.isVideoStuck = this.checkVideoStuck();
     }
@@ -81,7 +83,7 @@ export default class Fallback {
         }
         else if (dateNow - this.videoCurrentTimeTimeStamp > MAX_RETRY_TIMEOUT) {
             let msg = 'Falling back because the video player is stuck for more than : ' + MAX_RETRY_TIMEOUT / 1000 + ' s.';
-            SHOW_LOG && console.error(msg);
+            SHOW_LOG && logger.error(msg);
             isVideoStuck = true;
             this.fallback(msg);
             return;
@@ -93,11 +95,11 @@ export default class Fallback {
                 this.onStuckVideoPlayerTimeout = setTimeout(() => {
                     if (this.restartCount >= MAX_RESTARTS_ON_VIDEO_STUCK) {
                         let msg = 'Falling back because the video player has been restarted more than : ' + MAX_RESTARTS_ON_VIDEO_STUCK + ' time(s) for a specific time.';
-                        SHOW_LOG && console.error(msg);
+                        SHOW_LOG && logger.error(msg);
                         this.fallback(msg);
                         return;
                     } else {
-                        SHOW_LOG && console.log('Restarting the player because video data received from server but player is stuck');
+                        SHOW_LOG && logger.log('Restarting the player because video data received from server but player is stuck');
                         this.onRestartStream();
                     }
                 }, VIDEO_PLAYER_STUCK_TIMEOUT);
@@ -132,7 +134,7 @@ export default class Fallback {
             if (!supportedDataType) {
                 let msg = 'DirectStreaming is not supported for codec: ' + dataType;
                 this.fallback(msg);
-                SHOW_LOG && console.error(msg);
+                SHOW_LOG && logger.error(msg);
             }
         }
         return supportedDataType;
@@ -148,9 +150,9 @@ export default class Fallback {
         if (!supportedStream) {
             let msg = 'DirectStreaming is not supported for stream type: ' + streamType;
             this.fallback(msg);
-            SHOW_LOG && console.error(msg);
+            SHOW_LOG && logger.error(msg);
         }
-        SHOW_LOG && console.warn(streamType + ' supported: ' + supportedStream);
+        SHOW_LOG && logger.warn(streamType + ' supported: ' + supportedStream);
         return supportedStream;
     }
 
@@ -160,7 +162,7 @@ export default class Fallback {
      * @param {exception} exception
      */
     codeException(exception) {
-        SHOW_LOG && console.error('Exception: ' + exception);
+        SHOW_LOG && logger.error('Exception: ' + exception);
     }
 
     /**
@@ -174,7 +176,7 @@ export default class Fallback {
         let playedBefore = this.videoPlayer.videoElement.played.length ? this.videoPlayer.videoElement.played.end(0) : 0;
         let bufferedBefore = this.videoPlayer.videoElement.buffered.length ? this.videoPlayer.videoElement.buffered.end(0) : 0;
 
-        SHOW_LOG && console.log('Video player is waiting for data.');
+        SHOW_LOG && logger.log('Video player is waiting for data.');
         this.fragmentCountTimeout = setTimeout(() => {
             let playedAfter = this.videoPlayer.videoElement.played.length ? this.videoPlayer.videoElement.played.end(0) : 0;
             let bufferedAfter = this.videoPlayer.videoElement.buffered.length ? this.videoPlayer.videoElement.buffered.end(0) : 0;
@@ -182,7 +184,7 @@ export default class Fallback {
             if (playedBefore === playedAfter && bufferedBefore === bufferedAfter && Date.now() - this.lastFragmentReceiveTime < NO_VIDEO_TIMEOUT * 80 / 100) {
                 let msg = 'Video is waiting for more than ' + NO_VIDEO_TIMEOUT / 1000 + ' seconds';
                 this.fallback(msg);
-                SHOW_LOG && console.error(msg);
+                SHOW_LOG && logger.error(msg);
             }
         }, NO_VIDEO_TIMEOUT);
     }
@@ -211,7 +213,7 @@ export default class Fallback {
      * and reset it state.
      */
     destroy() {
-        SHOW_LOG && console.log('Fallback component is destroyed.');
+        SHOW_LOG && logger.log('Fallback component is destroyed.');
 
         this.fallback = () => { };
         this.onClearVideoStuck = () => { };

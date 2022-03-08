@@ -140,12 +140,12 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
 	 * 
 	 * @method open
 	 */
-    this.open = function () {
+    this.open = function () { 
         switch (state) {
             case XPMobileSDK.library.VideoConnectionState.notOpened:
                 setState(XPMobileSDK.library.VideoConnectionState.running);
                 if (window.Worker && XPMobileSDKSettings.supportsMultiThreaded) {
-                    console.info('Opening multithreaded video connection ' + self.videoId + ' with Web Worker');
+                    logger.info('Opening multithreaded video connection ' + self.videoId + ' with Web Worker');
                     self.worker = new Worker("js/ThreadConnection.js");
                     self.worker.addEventListener('message', function (e) {
                         if (e.data.message == 'onPushFailed') {
@@ -165,11 +165,11 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
                 }
                 else {
                     if (self.isPush) {
-                        console.info('Opening WebSocket video connection ' + self.videoId);
+                        logger.info('Opening WebSocket video connection ' + self.videoId);
                         self.communication = new XPMobileSDK.library.PushConnection(connectionURL + '/' + self.videoId + '/', { 'signalType': self.signalType});
                     }
                     else {
-                        console.info('Opening AJAX video connection ' + self.videoId);
+                        logger.info('Opening AJAX video connection ' + self.videoId);
                         self.communication = new XPMobileSDK.library.PullConnection(connectionURL + '/' + self.videoId + '/', { 'signalType': self.signalType});
                     }
                     self.communication.addObserver({
@@ -193,14 +193,14 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
                 break;
             case XPMobileSDK.library.VideoConnectionState.running:
                 if (self.isReusable) {
-                    console.info('Opening a reusable video connection from the pool ' + self.videoId);
+                    logger.info('Opening a reusable video connection from the pool ' + self.videoId);
                 } else {
-                    console.warn('WARNING: Attempting to open a running connection!');
+                    logger.warn('WARNING: Attempting to open a running connection!');
                 }
                 resetNoVideoTimeout();
                 break;
             case XPMobileSDK.library.VideoConnectionState.closed:
-                console.warn('WARNING: Attempting to re-open a closed connection!');
+                logger.warn('WARNING: Attempting to re-open a closed connection!');
                 stopNoVideoTimeout();
                 break;
         }
@@ -231,7 +231,7 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
 
         if (state == XPMobileSDK.library.VideoConnectionState.closed) return;
 
-        console.warn('Restarting video connection ' + self.videoId + ' for camera ' + self.cameraId);
+        logger.warn('Restarting video connection ' + self.videoId + ' for camera ' + self.cameraId);
         setState(XPMobileSDK.library.VideoConnectionState.closed);
         callbacks.onRestart(self);
 
@@ -257,7 +257,7 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
         if (self.worker && XPMobileSDKSettings.supportsMultiThreaded) {
             self.worker.terminate();
         }
-        console.log('Closing video connection ' + self.videoId + ' for camera ' + self.cameraId);
+        logger.log('Closing video connection ' + self.videoId + ' for camera ' + self.cameraId);
         setState(XPMobileSDK.library.VideoConnectionState.closed);
         callbacks.onClose(self);
 
@@ -345,7 +345,7 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
             }
         }
         else {
-            console.warn('Video connection received an item but doesn\'t have observer to send it to!');
+            logger.warn('Video connection received an item but doesn\'t have observer to send it to!');
             self.close();
             return;
         }
@@ -361,7 +361,7 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
             channels.push(parseURL(url));
         }
         if (!channels.length) channels.push(parseURL(XPMobileSDKSettings.MobileServerURL + XPMobileSDKSettings.videoChanel));
-        console.log('Available video channels: ', channels);
+        logger.log('Available video channels: ', channels);
 
         this.getNext = function () {
 
@@ -439,7 +439,7 @@ XPMobileSDK.library.VideoConnection = function (videoId, connectionRequest, call
 
         if (!channel.connected) {
             if (channel.hasNext()) {
-                console.log('Try next video channel.');
+                logger.log('Try next video channel.');
                 connectionURL = channel.getNext();
             }
             else {

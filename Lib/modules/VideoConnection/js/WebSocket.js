@@ -1,4 +1,4 @@
-﻿import { VideoConnectionState } from './config.js';
+import { VideoConnectionState } from './config.js';
 import VideoFrame from './header.js'
 
 let socketFailedTimestamp;
@@ -83,7 +83,7 @@ export default class Socket {
 
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onerror = (error) => {
-            console.error('WebSocket error', error);
+            logger.error('WebSocket error', error);
         };
         this.socket.onclose = this.onClose.bind(this);
 
@@ -112,7 +112,7 @@ export default class Socket {
         this.socket = null;
 
         if (this.videoConnectionState == VideoConnectionState.running) {
-            console.warn("Restarting socket.");
+            logger.warn("Restarting socket.");
             this.start();
         }
     }

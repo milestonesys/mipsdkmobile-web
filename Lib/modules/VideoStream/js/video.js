@@ -1,4 +1,6 @@
-﻿export default class VideoElement {
+'use strict';
+
+export default class VideoElement {
     constructor(videoElement, mediaSource, cameraId) {
         this.videoStuckTimeout = null;
 
@@ -18,7 +20,6 @@
         this.videoElement.preload = "none";
 
         this.videoElement.addEventListener('canplaythrough', this._onCanPlayThrough, false);
-        //this.videoElement.addEventListener('play', this._onPlay, false); //Removed for now until we decide if we need to calculate the buffer time
         this.videoElement.addEventListener('ended', this._onEnded, false);
         this.videoElement.addEventListener('playing', this.onPlaying.bind(this), false);
         this.videoElement.addEventListener('stalled', () => {this.play(1000)}, false);
@@ -90,7 +91,7 @@
                 }
             }
         } catch (e) {
-            console.log(e);
+            logger.log(e);
         }
     }
 

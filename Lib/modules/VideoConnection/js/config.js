@@ -36,6 +36,7 @@ const FrameHeaders = {
     HeaderExtensionStreamInfo: 0x40,
     HeaderExtensionCarouselInfo: 0x80,
     HeaderExtensionDynamicInfo: 0x100,
+    HeaderExtensionPlaybackInfo: 0x200,
     LiveFlags: {
         LiveFeed: 0x01,
         Motion: 0x02,

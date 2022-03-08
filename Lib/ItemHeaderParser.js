@@ -199,6 +199,15 @@
         };
 
         /**
+         * Get playback info 
+         */
+        self.parsePlaybackInfo = function () {
+            self.requestedTimeStampUtcMs = readBytes(8);
+            readBytes(4);
+            readBytes(4);
+        };
+
+        /**
          * Get stream information 
          */
         self.parseStreamInfo = function () {
@@ -268,6 +277,7 @@
     parser.HeaderExtensionStreamInfo = 0x40;
     parser.HeaderExtensionCarouselInfo = 0x80;
     parser.HeaderExtensionDynamicInfo = 0x100;
+    parser.HeaderExtensionPlaybackInfo = 0x200;
 
     parser.LiveFlags = {};
     parser.LiveFlags.LiveFeed = 0x01;
@@ -286,6 +296,8 @@
     parser.PlaybackFlags.DatabaseStart = 0x10;
     parser.PlaybackFlags.DatabaseEnd = 0x20;
     parser.PlaybackFlags.DatabaseError = 0x40;
+    parser.PlaybackFlags.RangeNoData = 0x100;
+    parser.PlaybackFlags.OutOfRange = 0x200;
 
     parser.DynamicInfoDataType = {};
     parser.DynamicInfoDataType.HeaderTypeDeviceStateInfo = 0;

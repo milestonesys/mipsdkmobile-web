@@ -1,4 +1,4 @@
-﻿XPMobileSDK.library.AudioPushConnection = function (itemIds, sampleRate, successCallback, errorCallback) {
+XPMobileSDK.library.AudioPushConnection = function (itemIds, sampleRate, successCallback, errorCallback) {
 
     this.open = open;
     this.close = close;
@@ -14,8 +14,8 @@
         onStreamSuccess: function (videoPushConnection) { },
         onStreamError: function (error) { },
         onAjaxLoading: function () { },
-        onAjaxSuccess: function (videoPushConnection) { },
-        onAjaxFailure: function () { console.error('ERROR in ajax request for audio push'); }
+      onAjaxSuccess: function (videoPushConnection) { },
+      onAjaxFailure: function () { logger.error('ERROR in ajax request for audio push'); }
     };
 
     var stream,

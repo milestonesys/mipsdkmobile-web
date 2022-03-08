@@ -1,4 +1,6 @@
-﻿import Template from './js/template.js';
+'use strict';
+
+import Template from './js/template.js';
 import Stream from './js/stream.js';
 
 const videoFormat = {
@@ -12,7 +14,6 @@ const videoFormat = {
     }
 }
 const CLEAR_VIDEO_RESTARTS = 20000; // in ms.
-const MAX_RESTARTS_PLAYER_ON_VIDEO_STUCK = 4; // Maximum number of restarts for a given time controlled by the Web Component
 
 class VideoStream extends HTMLElement {
     constructor() {
@@ -191,11 +192,7 @@ class VideoStream extends HTMLElement {
         this.stream && this.stream.destroy(true);
         this.stream = null;
 
-        if (this.numberOfStreamRestarts > MAX_RESTARTS_PLAYER_ON_VIDEO_STUCK || !navigator.onLine) {
-            this.startStream();
-        } else {
-            this.startStream(videoConnection);
-        }
+        this.startStream(navigator.onLine ? videoConnection : null);
         
         if (this.clearNumberOfRestarts) {
             clearTimeout(this.clearNumberOfRestarts);
@@ -203,7 +200,7 @@ class VideoStream extends HTMLElement {
         }
         this.clearNumberOfRestarts = setTimeout(() => {
             this.numberOfStreamRestarts = 0;
-            this.stream.fallbackController && (this.stream.fallbackController.restartCount = 0);
+            this.stream && this.stream.fallbackController && (this.stream.fallbackController.restartCount = 0);
         }, CLEAR_VIDEO_RESTARTS);
     }
 

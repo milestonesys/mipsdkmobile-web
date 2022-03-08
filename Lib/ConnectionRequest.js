@@ -73,7 +73,7 @@
                 lastLiveMessageRequestTimestamp = Date.now();
             }
 
-            console.log(requestXML);
+            logger.log(requestXML);
 
             ajaxRequest = XPMobileSDK.library.Ajax.Request(connectionURL, {
                 contentType: 'text/xml',
@@ -156,10 +156,10 @@
                 return;
             }
 
-            console.error('Command ' + command + ' failed');
+            logger.error('Command ' + command + ' failed');
 
             if (command == 'LiveMessage' || command == 'CloseStream' || command == 'RequestStream' || command == 'Disconnect') {
-                console.warn('Restarting ' + command);
+                logger.warn('Restarting ' + command);
 
                 CommunicationStability.addBreakDown(self);
 

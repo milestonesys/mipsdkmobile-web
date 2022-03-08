@@ -1,4 +1,4 @@
-﻿let VideoStreamState = {
+let VideoStreamState = {
 	new: 0,
 	open: 1,
 	closed: 2
@@ -70,7 +70,7 @@ class VideoStream {
 			this.callMethodOnObservers('videoConnectionReceivedFrame', event.detail.frame);
 		}
 		else {
-			console.warn('Video connection received an item but doesn\'t have observer to send it to!');
+			logger.warn('Video connection received an item but doesn\'t have observer to send it to!');
 			this.close();
 			return;
 		}

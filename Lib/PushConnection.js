@@ -32,7 +32,7 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
 
             if (Date.now() - socketFailedTimestamp < XPMobileSDKSettings.videoStreamRestartMinimumInterval) {
                 setTimeout(function () {
-                    console.warn("Restarting socket.");
+                    logger.warn("Restarting socket.");
                     createSocket();
                 }.bind(this), XPMobileSDKSettings.socketRestartMinimumInterval);
             }
@@ -53,14 +53,13 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
             if (this.videoConnectionState == XPMobileSDK.library.VideoConnectionState.closed) {
                 return;
             }
-            console.error('WebSocket initialization failed. Falling back to AJAX...');
+            logger.error('WebSocket initialization failed. Falling back to AJAX...');
             callMethodOnObservers('onPushFailed');
             return;
         }
 
         socket.binaryType = "arraybuffer";
         socket.onerror = function (exception) {
-            //console.error(exception);
             callMethodOnObservers('onError', socket);
         };
         socket.onopen = onOpen;
@@ -79,7 +78,7 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
     }.bind(this);
 
     this.restartConnection = function (request) {
-        console.warn("Restarting socket.");
+        logger.warn("Restarting socket.");
         this.startCommunication();
     }.bind(this);
 
@@ -102,7 +101,7 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
             this.messageInterval = null;
         }
 
-        console.log('WebSocket closed');
+        logger.log('WebSocket closed');
 
     }.bind(this);
 
@@ -125,7 +124,7 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
 
         callMethodOnObservers('notifyChannel', true);
 
-        console.log('WebSocket open');
+        logger.log('WebSocket open');
 
     }.bind(this);
 
@@ -144,7 +143,7 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
 
     var onError = function (error) {
 
-        console.error('WebSocket error', error);
+        logger.error('WebSocket error', error);
 
         if (this.messageInterval) {
             clearInterval(this.messageInterval);

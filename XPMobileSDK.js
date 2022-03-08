@@ -52,13 +52,13 @@ var XPMobileSDKSettings = {
 	SupportsAudioOut:                       true,
 	AudioCompressionLevel:                  99,
 	AudioCompressionLevelAudioAPI:          41,
-    NoVideoTimeout:                         5000,
-	EnableConsoleLog:						true,
+  NoVideoTimeout:                         5000,
+  EnableConsoleLog:                       true,
 	SupportsAdaptiveStreaming:				true,
 	
 	includes: [
     /* [MINIFY_JS] */
-        'Lib/tools/logging.js',
+    'Lib/tools/logger.js',
 		'Lib/tools/polyfills.js',
 		'Lib/tools/webStorage.js',
         
@@ -96,7 +96,6 @@ var XPMobileSDKSettings = {
 };
 
 var XPMobileSDK = new function () {
-	
 	this.onLoad = function () {};
 	
 	this.library = {};
@@ -185,6 +184,7 @@ var XPMobileSDK = new function () {
 	this.getAlarmDataSettings = getAlarmDataSettings;
 	this.getAlarmUsers = getAlarmUsers;
 	this.acknowledgeAlarm = acknowledgeAlarm;
+	this.GetBookmarks = GetBookmarks;
 	this.getBookmarks = getBookmarks;
 	this.deleteBookmark = deleteBookmark;
 	this.prevCarouselCamera = prevCarouselCamera;
@@ -218,7 +218,7 @@ var XPMobileSDK = new function () {
 		path = script.src.replace(RegExp(XPMobileSDKSettings.fileName + '.*$'), '');
 		head = document.querySelector('head');
 
-		load(XPMobileSDKSettings.includes.slice());
+    load(XPMobileSDKSettings.includes.slice());
 	}
 	
     /**
@@ -241,8 +241,8 @@ var XPMobileSDK = new function () {
 				loadComplete();
 			}
 		});
-		script.addEventListener('error', function () {
-			console.error('Script load error!');
+    script.addEventListener('error', function () {
+      console.error('Script load error!');
 		});
 		script.src = url;
 
@@ -517,6 +517,7 @@ var XPMobileSDK = new function () {
 	 * @method disconnect
 	 */
 	function disconnect() {
+		  logger.error("disconnect");
 	    XPMobileSDK.library.Connection.Disconnect();
 	}
 
@@ -537,6 +538,7 @@ var XPMobileSDK = new function () {
 	 * @param {Function} failCallback - function that is called when the command execution has failed and the error is passed as a parameter.
      */
 	function Disconnect(params, successCallback, failCallback) {
+		  logger.error("Disconnect");
 	    XPMobileSDK.library.Connection.Disconnect(params, successCallback, failCallback);
 	}
 
@@ -546,7 +548,7 @@ var XPMobileSDK = new function () {
      * 
      * @example setInterval(function(){XPMobileSDK.LiveMessage()}, 24000);
      * 
-     * @method Disconnect
+     * @method LiveMessage
      * @param {Object} params - Parameters to sent to the server.  May contain:
      * <pre>
      * - {String} ConnectionId - Connection ID retrieved from Connect command
@@ -1743,12 +1745,16 @@ var XPMobileSDK = new function () {
 	/**
 	 * Gets a list of bookmarks
 	 * 
-	 * @method getBookmarksList
+	 * @method getBookmarks
 	 * @param {Object} parameters - Object containing the following properties:
 	 * <pre>
 	 * - {String} MyBookmarks - YES/NO - flag whether to send only my Bookmarks
-	 * - {Number} Timestamp - Target time
-	 * - {Number} Count - Max bookmarks count to return
+	 * - {Number} Count - Maximum number of bookmarks to be returned in the result. If you want to retrieve a specific bookmark you should not specify the count, but provide the BookmarkId only.
+	 * - {String} StartTime - (Optional) Start time of the search interval. It specifies from where the search of bookmark will begin. If not specified current time will be considered as a start time.
+	 * - {String} EndTime - (Optional) End time of the search interval. If the EndTime is set before the StartTime than the bookmarks will be returned in reversed order again starting to search from StartTime to EndTime.
+	 * - {String} MyBookmarks - (Optional)YES/NO - flag whether to send only my Bookmarks
+	 * - {String} Keyword - (Optional)Search string to appear in either of the fields 'Reference', 'Header', 'Description'
+	 * - {String} SearchCameraIds - (Optional) Included cameras GUIDs in a comma separated string
 	 * </pre>
 	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
 	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
@@ -1757,6 +1763,33 @@ var XPMobileSDK = new function () {
 	 */
 	function getBookmarks(parameters, successCallback, errorCallback) {
 		return XPMobileSDK.library.Connection.getBookmarks(parameters, successCallback, errorCallback);
+	}
+
+
+	/**
+	 * Gets a list of bookmarks. There are 3 valid usages of the command. 
+	 * The first one is to provide Count in order to retrieve only the latest bookmarks. 
+	 * The second one is to provide BookmarkId in order to retrieve a single bookmark. 
+	 * And the last one is to get a list of bookmarks searching from specified bookmark - than BookmarkId and Count should be provided.
+	 *
+	 * @method GetBookmarks
+	 * @param {Object} params - Parameters to sent to the server.  May contain:
+	 * <pre>
+	 * - {String} BookmarkId - GUID of the Bookmark. 
+	 *						   If specified along with Count, StartTime will be ignored and the Bookmark will be considered as a start time of the search interval. 
+	 *						   If only BookmarkId is specified than single bookmark will be returned as a result
+	 * - {Number} Count - Maximum number of bookmarks to be returned in the result. If you want to retrieve a specific bookmark you should not specify the count, but provide the BookmarkId only.
+	 * - {String} StartTime - (Optional) Start time of the search interval. It specifies from where the search of bookmark will begin. If not specified current time will be considered as a start time.
+	 * - {String} EndTime - (Optional) End time of the search interval. If the EndTime is set before the StartTime than the bookmarks will be returned in reversed order again starting to search from StartTime to EndTime.
+	 * - {String} MyBookmarks - (Optional)YES/NO - flag whether to send only my Bookmarks
+	 * - {String} Keyword - (Optional)Search string to appear in either of the fields 'Reference', 'Header', 'Description'
+	 * - {String} SearchCameraIds - (Optional) Included cameras GUIDs in a comma separated string
+	 * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	function GetBookmarks(parameters, successCallback, errorCallback) {
+		return XPMobileSDK.library.Connection.GetBookmarks(parameters, successCallback, errorCallback);
 	}
 
 	/**
