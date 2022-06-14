@@ -34,6 +34,7 @@ This repo contains samples that demonstrate MIP SDK Mobile web (JavaScript) inte
 - Video push
 - Push-to-talk
 - PTZ
+- Bookmarks
 
 ## Prerequisites
 

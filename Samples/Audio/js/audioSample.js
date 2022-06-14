@@ -6,7 +6,9 @@
         var self = this,
             audioStreamId,
             url,
-            sourceBuffer;
+            sourceBuffer,
+            abortController,
+            signal;
 
         self.mediaSource = new MediaSource;
         self.container;
@@ -24,17 +26,15 @@
             self.audioPlayer.addEventListener("pause", stopAudioStream);
             self.audioPlayer.addEventListener("stop", stopAudioStream);
             self.audioPlayer.addEventListener('canplay', onCanPlay, false);
+            self.audioPlayer.addEventListener("play", function () { self.audioActive = true; }, false);
 
             self.container.addEventListener('playStream', function (event) {
-                tryStopStreaming(self.container, self.audioPlayer);
-                audioStreamId = tryCloseStream(audioStreamId);
-
                 requestAudioStream(event, cameraItem, audioStreamSuccessCallback);
             });
 
             self.container.addEventListener('pauseStream', function (event) {
-                tryStopStreaming(self.container, self.audioPlayer);
-                audioStreamId = tryCloseStream(audioStreamId);
+
+                stopAudioStream();
 
                 event.currentTarget.classList.remove('audio-playing');
             });
@@ -97,32 +97,36 @@
         }
 
         var onPlayError = function (error) {
-            if (!this.audioActive) {
+
+            if (!self.audioActive) {
                 return;
             }
 
             stopAudioStream();
 
-            if (error.name != "AbortError" && error.name != "InvalidStateError" && !this.stoppedByButtonClick) {
-                this.onNetworkError();
+            if (error.name != "AbortError" && error.name != "InvalidStateError" && !self.stoppedByButtonClick) {
+                audioStreamErrorCallback(error);
             }
 
             if (error.name == "AbortError") {
-                this.stoppedByButtonClick = true;
+                self.stoppedByButtonClick = true;
             } else {
-                this.stoppedByButtonClick = false;
+                self.stoppedByButtonClick = false;
             }
 
         }
 
         var stopAudioStream = function () {
-            if (!this.audioActive) {
+
+            if (!self.audioActive) {
                 return;
             }
 
-            this.audioActive = false;
+            self.audioActive = false;
 
             var sourceBufferedLength = sourceBuffer ? sourceBuffer.buffered.length : 0;
+            
+            abortController.abort();
 
             if (self.mediaSource.readyState == "open") {
                 sourceBuffer.abort();
@@ -131,26 +135,23 @@
                 // If sourceBufferedLength is 0 calling to mediaSource.endOfStream() causes an error and the player cannot be started again
                 // Can be tested when player is started and then stopped during a video gap in playback mode
                 if (sourceBufferedLength) {
-                    mediaSource.endOfStream();
+                    self.mediaSource.endOfStream();
                 }
             }
 
             if (resBodyReader) {
-                resBodyReader.cancel().catch(this.onPromiseReject);
+                resBodyReader.cancel().catch(function () { });
                 resBodyReader.releaseLock();
-                resBody.cancel().catch(this.onPromiseReject);
+                resBody.cancel().catch(function () { });
 
                 resBodyReader = null;
                 resBody = null;
             }
 
-            this.pause();
+            tryStopStreaming.call(self, audioStreamId);
+            audioStreamId = null;
 
-            this.cleanUp();
-
-            this.audioStream.stopStreaming();
-
-        }
+        };
 
         var signalEndOfStream = function (error) {
             // Fix for Edge because in that browser events for errors are not fired like in other browsers. 
@@ -170,7 +171,11 @@
             sourceBuffer = self.mediaSource.addSourceBuffer("audio/mpeg")
             sourceBuffer.mode = "sequence";
 
-            fetchWithTimeout(3000, fetch(url), self.isLive)
+
+            abortController = new AbortController();
+            signal = abortController.signal;
+
+            fetchWithTimeout(3000, fetch(url, { signal: signal }), self.isLive)
                 .then(getReader)
                 .then(playStream)
                 .catch(onPlayError);
@@ -267,15 +272,12 @@
             playAudio();
 
             self.container.addEventListener('playStream', function (event) {
-                tryStopStreaming(self.container, self.audioPlayer);
-                audioStreamId = tryCloseStream(audioStreamId);
-
                 requestAudioStream(event, cameraItem, audioStreamSuccessCallback);
             });
 
             self.container.addEventListener('pauseStream', function (event) {
-                tryStopStreaming(self.container, self.audioPlayer);
-                audioStreamId = tryCloseStream(audioStreamId);
+                tryStopStreaming.call(self, audioStreamId);
+                audioStreamId = null;
 
                 event.currentTarget.classList.remove('audio-playing');
             });
@@ -286,27 +288,27 @@
         };
     };
 
-    function tryCloseStream(audioStreamId) {
-        // Close stream and reset variable
+    function tryStopStreaming(audioStreamId) {
+
         if (audioStreamId == null) {
             return audioStreamId;
         }
 
-        XPMobileSDK.closeStream(audioStreamId);
-
-        audioStreamId = null;
-
-        return audioStreamId;
-    }
-
-    function tryStopStreaming(container, audioPlayer) {
         // Stop stream and reset variable
-        container.classList.remove('audio-playing');
+        this.container.classList.remove('audio-playing');
 
         try {
-            audioPlayer.pause();
+            this.audioPlayer.pause();
+
+            // this prevents thread leaks and crashes as removing all references to the audio tag
+            // is not enough for the garbage collection of the audio stream to take place
+            //this.player.src = '';
+            this.audioPlayer.removeAttribute('src');
+            this.audioPlayer.load();
         }
         catch (e) { }
+
+        XPMobileSDK.closeStream(audioStreamId);
     }
 
     function requestAudioStream(event, camera, audioStreamSuccessCallback) {

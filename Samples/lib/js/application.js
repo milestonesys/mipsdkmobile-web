@@ -265,7 +265,15 @@ var Application = new function () {
 	            streamRequest = null;
 	        }
 
-	        document.getElementById('container' + Id).removeEventListener('click', stop);
+			document.getElementById('container' + Id).removeEventListener('click', stop);
+
+			
+			var event = new CustomEvent('pauseStream', {
+				detail: {
+					videoConnection: videoController
+				}
+			});
+			container.parentNode.dispatchEvent(event);
 	    };
 
 	    function resetState() {
@@ -378,8 +386,8 @@ var Application = new function () {
                 Speed: speed
             };
 
-            XPMobileSDK.ChangeStream(params, function () {
-                var eventType = speed === 0 ? 'pauseStream' : 'playStream';
+			XPMobileSDK.ChangeStream(params, function () {
+				var eventType = speed === 0 ? 'pauseStream' : 'playStream';
                 var event = new CustomEvent(eventType, {
                     detail: {
                         videoConnection: videoController

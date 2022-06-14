@@ -55,6 +55,7 @@ var XPMobileSDKSettings = {
   NoVideoTimeout:                         5000,
   EnableConsoleLog:                       true,
 	SupportsAdaptiveStreaming:				true,
+	enablePlaybackAudioSourceSelection:		true,
 	
 	includes: [
     /* [MINIFY_JS] */
@@ -90,7 +91,8 @@ var XPMobileSDKSettings = {
 		'Lib/AudioHeaderParser.js',
 		'Lib/VideoConnectionPool.js',
 		'Lib/VideoPushConnection.js',
-        'Lib/AudioPushConnection.js'
+		'Lib/AudioPushConnection.js',
+		'Lib/AudioAvailability.js'
 		/* [/MINIFY_JS] */
 	]
 };
@@ -152,7 +154,6 @@ var XPMobileSDK = new function () {
 	this.getPrevSequence = getPrevSequence;
 	this.getSequencesInInterval = getSequencesInInterval;
 	this.startVideoExport = startVideoExport;
-	this.startImageExport = startImageExport;
 	this.restartErroneousExport = restartErroneousExport;
 	this.getUserExports = getUserExports;
 	this.getAllExports = getAllExports;
@@ -1219,21 +1220,6 @@ var XPMobileSDK = new function () {
 	}
 
     /**
-	 * Starts a new still image export.
-	 * 
-	 * @method startImageExport
-	 * @param {String} cameraId - GUID of the camera
-	 * @param {Number} startTime - timestamp in UTC, the time of the still image
-	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-	 * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-	 * 
-	 * @return {ConnectionRequest} - the ConnectionRequest object
-	 */
-	function startImageExport(cameraId, startTime, successCallback, errorCallback) {
-	    return XPMobileSDK.library.Connection.startImageExport(cameraId, startTime, successCallback, errorCallback);
-	}
-
-    /**
 	 * Restarts an exports that has previously failed. Requires a valid exportId.
 	 * 
 	 * @method restartErroneousExport
@@ -2035,7 +2021,6 @@ var XPMobileSDK = new function () {
  * @property {Function} connectionLostConnection - Sent to observers when connection to the server was lost.
  * @property {Function} connectionProcessingDisconnect - Sent to observers when the disconnect command is sent.
  * @property {Function} connectionDidDisconnect - Sent to observers when connection to the server was closed on request via disconnect method.
- * @property {Function} connectionSwitchedToPull - Sent to observers when all video connections have been switched to pull mode.
  * @property {Function} connectionRequestSucceeded - Sent to observers every time a request to the server has been received properly and without timeout or other terminal errors.
  */
 XPMobileSDK.interfaces.ConnectionObserver = {
@@ -2122,13 +2107,6 @@ XPMobileSDK.interfaces.ConnectionObserver = {
 	 * @method connectionDidDisconnect
 	 */
     connectionDidDisconnect: function () { },
-
-    /**
-	 * Sent to observers when all video connections have been switched to pull mode.
-	 * 
-	 * @method connectionSwitchedToPull
-	 */
-    connectionSwitchedToPull: function () { },
 
     /**
 	 * Sent to observers every time a request to the server has been received properly and without timeout or other terminal errors.

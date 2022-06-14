@@ -113,13 +113,6 @@ XPMobileSDK.library.ConnectionObserverInterface = {
 	 * @method connectionDidDisconnect
 	 */
 	connectionDidDisconnect: function () {},
-	
-	/**
-	 * Sent to observers when all video connections have been switched to pull mode.
-	 * 
-	 * @method connectionSwitchedToPull
-	 */
-	connectionSwitchedToPull: function () {},
 
 	/**
 	 * Sent to observers every time a request to the server has been received properly and without timeout or other terminal errors.
@@ -959,18 +952,6 @@ Connection = function() {
 		window.dispatchEvent(new CustomEvent("AnalyticsSettingChanged"));
 	};
 	
-	var restartCameras = function() {
-		
-		XPMobileSDK.library.VideoConnection.instances.forEach(function(videoConnection) {
-		    videoConnection.getState() == XPMobileSDK.library.VideoConnectionState.running && videoConnection.restart();
-		});
-	};
-	
-	var switchToPull = function () {
-
-		callMethodOnObservers('connectionSwitchedToPull');
-	};
-	
 	/**
 	 * Sends a ChangeStream command to the server. Changes the visual part of the stream that the given videoConnection represents. 
 	 * 
@@ -1612,26 +1593,6 @@ Connection = function() {
 		return self.sendCommand('StartExport', params, { successCallback: successCallback }, startExportCallback, failCallback);
 	};
 
-	/**
-	 * Starts a new still image export.
-	 * 
-	 * @method startImageExport
-	 * @param {String} cameraId: indicates the camera this export will be extracted from
-	 * @param {Number} startTime: timestamp in UTC, the time of the still image
-	 * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
-	 * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
-	 */
-	this.startImageExport = function (cameraId, startTime, successCallback, failCallback) {
-
-		var params = {
-			CameraId: cameraId,
-			StartTime: startTime,
-			Type: 'Jpeg'
-		};
-
-		return self.sendCommand('StartExport', params, { successCallback: successCallback }, startExportCallback, failCallback);
-	};
-	
 	/**
 	 * Restarts an exports that has previously failed. Requires a valid exportId.
 	 * 

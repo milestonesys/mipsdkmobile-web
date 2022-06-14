@@ -1,0 +1,155 @@
+/*
+	Create Bookmarks form
+*/
+.createBookmarkWrapper {
+	font: 13px Arial, Helvetica, sans-serif;
+}
+
+.formWrapper {
+	max-width: 35%;
+}
+
+@media only screen and (max-width: 1366px) {
+	.formWrapper {
+		max-width: 50%;
+	}
+}
+
+.createBookmarkWrapper div .labelText {
+    width: 150px;
+	font-weight: bold;
+	float: left;
+	padding-top: 8px;
+	padding-right: 5px;
+}
+
+.createBookmarkWrapper div .labelText .required {
+    color: red;
+}
+
+.createBookmarkWrapper .requiredParameters div,
+.createBookmarkWrapper .optionalParameters div {
+	display: flex;
+    align-items: baseline;
+}
+
+.createBookmarkWrapper form input,
+.createBookmarkWrapper form select, 
+.createBookmarkWrapper form textarea {
+	width: 100%;
+    padding: 5px 9px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+	background-color: rgb(232, 240, 254);
+}
+
+.createBookmarkWrapper form input:focus,
+.createBookmarkWrapper form select:focus, 
+.createBookmarkWrapper form textarea:focus {
+    outline: none;
+	box-shadow: 0 0 7px 1px #329AE4;
+}
+
+.createBookmarkWrapper form button {
+	margin-left: 154px;
+	border: none;
+	border-radius: 3px;
+    padding: 8px 15px 8px 15px;
+    background: #329AE4;
+    color: #fff;
+}
+
+.createBookmarkWrapper form button:hover {
+	background: #1f557c;
+	cursor: pointer;
+}
+
+.createBookmarkWrapper #additionalInfo {
+	height: 20px;
+	width: 20px;
+}
+
+.requiredParameters, .optionalParameters {
+    padding-bottom: 20px;
+}
+
+.requiredParameters div, 
+.optionalParameters div {
+    margin-bottom: 10px;
+}
+
+/*
+	All Bookmarks Table
+*/
+.createdBookmarksWrapper table th,
+.createdBookmarksWrapper table td {
+	text-align: left;
+}
+
+.createdBookmarksWrapper table.layout {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.createdBookmarksWrapper table.display {
+	margin: 1em 0;
+}
+
+.createdBookmarksWrapper table.display th {
+	background: #329AE4; 
+}
+
+.createdBookmarksWrapper table.display td {
+	background: #1f557c; 
+}
+  
+.createdBookmarksWrapper table.display th,
+.createdBookmarksWrapper table.display td {
+	border: 1px solid #767676;
+	padding: .5em 1em;
+}
+
+.createdBookmarksWrapper table tbody tr:hover td {
+	background: #329AE4;
+}
+    
+.createdBookmarksWrapper table button {
+	border: none;
+    border-radius: 3px;
+    padding: 8px 15px 8px 15px;
+    background: #b2253c;
+    color: #fff;
+	cursor: pointer;
+}
+
+.createdBookmarksWrapper table button:hover {
+    background: #90172b;
+}
+
+/*
+  Default selectors
+*/
+.hide {
+    display: none;
+}
+
+.createdBookmarksWrapper table.layout,
+.createBookmarkWrapper .section-style-heading {
+	width: 100%;
+} 
+
+.createBookmarkWrapper,
+.createdBookmarksWrapper{
+	padding: 20px 12px 10px 20px;
+}
+
+.section-style-heading {
+	font-weight: bold;
+	font-style: italic;
+	border-bottom: 2px solid #ddd;
+	margin-bottom: 20px;
+	font-size: 18px;
+	padding-bottom: 3px;
+}
+
+

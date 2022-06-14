@@ -1,4 +1,4 @@
-XPMobileSDK.library.AudioPushConnection = function (itemIds, sampleRate, successCallback, errorCallback) {
+﻿XPMobileSDK.library.AudioPushConnection = function (itemIds, sampleRate, successCallback, errorCallback) {
 
     this.open = open;
     this.close = close;
@@ -84,6 +84,10 @@ XPMobileSDK.library.AudioPushConnection = function (itemIds, sampleRate, success
     }
 
     function send(pcmData) {
+        if (!stream) {
+            return;
+        }
+
         var buffer = new ArrayBuffer(headerSize + pcmData.length);
         var bufferView = new Int8Array(buffer);
 
