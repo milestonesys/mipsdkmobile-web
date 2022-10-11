@@ -50,19 +50,9 @@
                     position: relative;
                     width: 28px;
                     height: 28px;
-                    background-position: center;
-                    background-repeat: no-repeat;
                     cursor: pointer;
-                    bottom: -3px;
-                    margin-left: 16px;
                     border-radius: 50%;
                     background-color: rgba(0, 0, 0, 0.4);
-                }
-
-                #audioButton {
-                    float: none;
-                    bottom: 0 !important;
-                    margin: 0 !important;
                     background-image: url("/images/audio_muted.svg");
                     background-position: center;
                     background-repeat: no-repeat;
@@ -70,18 +60,18 @@
                     box-sizing: border-box;
                 }
 
-                #audioButton.playing {
+                .btn.playing {
                     background-image: url("/images/audio_on.svg");
                 }
 
-                #audioButton.disabled {
+                .btn.disabled {
                     display: block !important;
                     cursor: default !important;
                     opacity: 0.5;
                 }
 
-                #audioButton.disabled:hover {
-                    background-color: transparent !important;
+                .btn:hover:not(.disabled){
+                    background-color: var(--primary-hover-icon-background-color-a05) !important;
                 }
             </style>
                 <div class="shadowWrapper" part="shadowWrapper">

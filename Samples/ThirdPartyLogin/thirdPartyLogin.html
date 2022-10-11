@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Third party login sample</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../lib/css/sample.css">
+    <link rel="stylesheet" type="text/css" href="css/sample.css">
+</head>
+
+<body>
+    <section class="login-form">
+        <h3 class="login-form-header">Login form</h3>
+        <div class="connect-form-content">
+            <label for="server-name">
+                <span class="label-text">
+                    <span>Server</span>
+                    <span class="default-server"></span>
+                </span>
+            </label>
+            <div>
+                <input type="text" class="server-name input" name="server" placeholder="Server" />
+                <button type="button" class="connect-button button">Connect</button>
+            </div>
+        </div>
+        <div class="login-form-content display-none">
+            <div class="login-button-oidc hide">
+                <a class="btn-oidc btn" part="link"></a>
+            </div>
+        </div>
+    </section>
+    
+    <section id="bookmarks-container" class="hide">
+        <div class="createBookmarkWrapper">
+            <div class="section-style-heading">Please Enter Bookmark Parameters</div>
+            <div class="formWrapper">
+                <form id="bookmarkForm" action="#" method="post">
+                    <div class="requiredParameters">
+                        <div>
+                            <label for="Id">
+                                <span class="labelText">Select camera <span class="required">*</span></span>
+                            </label>
+                            <select id="cameras" name="Id"></select>
+                        </div>
+                        <div>
+                            <label for="DateTime">
+                                <span class="labelText">Bookmark Time<span class="required">*</span></span>
+                            </label>
+                            <input type="datetime-local" for="DateTime" id="DateTime" name="DateTime" required step="1">
+                        </div>
+                        <div>
+                            <label for="Headline">
+                                <span class="labelText">Headline <span class="required">*</span></span>
+                            </label>
+                            <input for="Headline" id="Headline" name="Headline" required placeholder="Default Bookmark Headline">
+                        </div>
+                    </div>
+
+                    <div class="optionalParameters">
+                        <div>
+                            <label for="Description">
+                                <span class="labelText">Description</span>
+                            </label>
+                            <textarea for="Description" name="Description" id="Description" cols="30" rows="10"
+                                      placeholder="Default Description"></textarea>
+                        </div>
+                        <div>
+                            <label for="StartTime">
+                                <span class="labelText">Start Time</span>
+                            </label>
+                            <input type="datetime-local" for="StartTime" name="StartTime" id="StartTime" step="1">
+                        </div>
+                        <div>
+                            <label for="EndTime">
+                                <span class="labelText">End Time</span>
+                            </label>
+                            <input type="datetime-local" for="EndTime" name="EndTime" id="EndTime" step="1">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit">Create bookmark</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="createdBookmarksWrapper">
+            <div class="page">
+                <div class="section-style-heading">Check All Created Bookmarks</div>
+                <table class="layout display responsive-table" id="allBookmarks">
+                    <thead>
+                        <tr>
+                            <th>Bookmark ID</th>
+                            <th>Camera Name</th>
+                            <th>Description</th>
+                            <th>Reference</th>
+                            <th>Time Begin</th>
+                            <th>Time End</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script src="../lib/js/sdkLoader.js"></script>
+    <script src="../lib/js/thirdPartyLoginManager.js"></script>
+    <script src="js/bookmarksSample.js"></script>
+    <script src="js/sample.js"></script>
+</body>
+
+</html>

@@ -133,12 +133,22 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 			self.error = {
 				code: self.errorCode || XPMobileSDK.library.ConnectionError.Unknown,
 				message: self.errorString || ''
-            };
+			};
 
-            var commandNameNode = CommandNode.getElementsByTagName('Name');
-            if (commandNameNode.length > 0 && XMLNodeTextContent(commandNameNode[0]) !== "CloseStream") {
-                logger.error('Response error ' + (self.errorString || getError(self.errorCode)) + ' ' + (self.errorCode || '') + ' Complete response: ' + xmlString);
-            }
+			const commandNameNode = CommandNode.getElementsByTagName('Name');
+			if (commandNameNode.length > 0) {
+				const commandName = XMLNodeTextContent(commandNameNode[0]);
+				let logError = true;
+				if (commandName === "CloseStream") {
+					logError = false;
+				}
+				if (commandName === "LogIn" && self.errorCode === XPMobileSDK.library.ConnectionError.SecondStepAuthenticationRequired) {
+					logError = false;
+				}
+				if (logError) {
+					logger.error('Response error ' + (self.errorString || getError(self.errorCode)) + ' ' + (self.errorCode || '') + ' Complete response: ' + xmlString);
+				}
+			}
 		}
 	}
 	

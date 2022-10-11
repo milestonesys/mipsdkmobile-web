@@ -31,7 +31,7 @@ class AudioStream extends BaseElement {
         this.addEventListener('mouseleave', this.hideAudioSelectLabel.bind(this));
 
         this.addEventListener('deleteAudioState', this.deleteAudioState.bind(this));
-
+        this.playbackControllerId = null;
     }
 
     get active() {
@@ -184,9 +184,11 @@ class AudioStream extends BaseElement {
 
         this.applyStrings();
 
-        let params = event.detail || this.params;
+        this.params = event.detail || this.params;
 
-        this.params = params;
+        if (this.playbackControllerId) {
+            this.params['playbackControllerId'] = this.playbackControllerId;
+        }
 
         this.stateId = name;
 
@@ -234,7 +236,9 @@ class AudioStream extends BaseElement {
         this.dispatchEvent(new CustomEvent("audioInitialized", { detail: { selectAudioSource: this.audioSourceDropDown } }));
         this.audioController.onErrorCallback = this.onErrorCallback.bind(this);
         this.audioController.setDisabled(this.disabled);
-        this.setContinueToPlay();
+        if (event.detail.canPlay) {
+            this.setContinueToPlay();
+        }
     }
 
     getAudioSourceState() {
@@ -282,7 +286,11 @@ class AudioStream extends BaseElement {
     }
 
     onSetAudioStreamOption(event) {
-        this.audioController && this.audioController.setAudioStreamOption(event.detail.name, event.detail.value);
+        if (this.audioController) {
+            this.audioController.setAudioStreamOption(event.detail.name, event.detail.value);
+        } else {
+            this.playbackControllerId = event.detail.value;
+        }
     }
 
     onSwitchToLive(event) {
@@ -336,6 +344,7 @@ class AudioStream extends BaseElement {
         this.removeEventListener('setContinueToPlay', this.setContinueToPlay.bind(this));
 
         this.removeEventListener('deleteAudioState', this.deleteAudioState.bind(this));
+        this.playbackControllerId = null;
     }
 }
 

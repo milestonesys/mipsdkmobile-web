@@ -14,6 +14,10 @@ body {
     color: #ffffff;
 }
 
+#login-form-container.hide {
+    display: none;
+}
+
 .connect-form-content {
     margin-bottom: 30px;
 }
@@ -43,6 +47,28 @@ body {
 .button:focus {
     box-shadow: 0 0 7px 1px #3cf;
     outline: none;
+}
+
+.login-button-oidc {
+    margin: 0;
+    padding: 9px 0;
+    line-height: 20px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.login-button-oidc .btn {
+    text-decoration: none;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+    color: black;
+}
+
+.login-button-oidc.hide {
+    display: none;
 }
 
 .label-text,

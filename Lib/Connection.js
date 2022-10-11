@@ -162,7 +162,7 @@ Connection = function() {
 	this.serverId = null;
 	
 	/**
-	 * Keeps the name of the currently logged in user
+	 * Keeps the username provided by the server of the currently logged in user
 	 * @property {String} currentUserName
 	 */
 	this.currentUserName = null; 
@@ -316,16 +316,7 @@ Connection = function() {
 			self.serverId = connectionResponse.outputParameters.ServerId;
 
 			if (self.storage) {
-			
-				if (typeof self.storage.getItem('resizeAvailable') == 'boolean') {
-					self.resizeAvailable = self.storage.getItem('resizeAvailable');
-				}
-				else {
-					self.resizeAvailable = true;
-					self.storage.setItem('resizeAvailable', self.resizeAvailable);
-				}
-							
-				self.webSocketServer = connectionResponse.outputParameters.WebSocketSupport == 'Yes';
+			    self.webSocketServer = connectionResponse.outputParameters.WebSocketSupport == 'Yes';
                 self.storage.setItem('webSocketServer', self.webSocketServer);
 				
 				if (typeof self.storage.getItem('webSocketBrowser') == 'boolean' && !!window.WebSocket) {
@@ -451,6 +442,9 @@ Connection = function() {
 
 		self.exportToMkv = connectionResponse.outputParameters.ExportToMkv == 'Yes';
 		self.storage.setItem('exportToMkv', self.exportToMkv);
+		if (connectionResponse.outputParameters.Username) {
+			self.currentUserName = connectionResponse.outputParameters.Username;
+		}
 
     logger.info('Logged in');
 		getFeatures(connectionResponse.outputParameters);
@@ -608,6 +602,28 @@ Connection = function() {
 			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
 		});
 	};
+
+	/**
+	 * Sends a GetItems command to the server. Retrieves all folders and cameras inside in a single command.
+	 *
+	 * @method getAllViews
+	 * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
+	 */
+	this.getAllCameras = function (successCallback, failCallback) {
+ 		return self.sendCommand('GetItems', { ItemKind: 'Camera', Hierarchy: 'UserDefined', IncludeRelatedDevices: 'Yes' }, { successCallback: successCallback }, getAllCamerasCallback, failCallback);
+	};
+
+	/**
+	* Called when getAllViews response is received
+	* 
+    * @param 		connectionRequest		object		Response from AXAJ call
+	*/
+	var getAllCamerasCallback = function (connectionRequest) {
+		callbackAfterRequest(connectionRequest, 'Error executing GetItems on the server.', function () {
+			connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
+		});
+	};
 	
 	this.getOsmServerAddresses = function (successCallback, failCallback) {
 
@@ -706,10 +722,6 @@ Connection = function() {
 		
 		if (options.motionOverlay) {
 			params.MotionOverlay = 'Yes';
-		}
-		
-		if (XPMobileSDK.features.SupportNoScaledImages) {
-			params.ResizeAvailable = 'Yes';
 		}
 		
 		if (XPMobileSDK.features.MultiCameraPlayback && options.playbackControllerId) {
@@ -2851,10 +2863,6 @@ Connection = function() {
 	var getFeatures = function (features) {
 		
 		if (!features) return;
-
-		if (!features.SupportNoScaledImages) {
-			features.SupportNoScaledImages = 'Yes'; // default value
-		}
 		
 		var data = {};
 		for (i in features) {

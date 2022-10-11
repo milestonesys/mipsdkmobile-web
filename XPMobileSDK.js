@@ -72,7 +72,8 @@ var XPMobileSDKSettings = {
 		'Lib/security/CHAP.js',
 		'Lib/security/Challenge.js',
 		'Lib/security/DiffieHellman.js',
-        'Lib/security/ISO10126.js',
+		'Lib/security/ISO10126.js',
+		'Lib/security/PKCECode.js',
 		
 		'Lib/communication/Ajax.js',
 		'Lib/communication/Bytes.js',
@@ -114,12 +115,15 @@ var XPMobileSDK = new function () {
 	this.connectWithId = connectWithId;
 	this.login = login;
 	this.Login = Login;
+	this.externalLogin = externalLogin;
+	this.ExternalLogin = ExternalLogin;
 	this.requestCode = requestCode;
 	this.verifyCode = verifyCode;
 	this.disconnect = disconnect;
 	this.Disconnect = Disconnect;
 	this.LiveMessage = LiveMessage;
 	this.getAllViews = getAllViews;
+	this.getAllCameras = getAllCameras;
 	this.getViews = getViews;
 	this.requestStream = requestStream;
 	this.RequestStream = RequestStream;
@@ -484,6 +488,101 @@ var XPMobileSDK = new function () {
 	    var connectionRequest = XPMobileSDK.library.Connection.Login(params, successCallback, failCallback);
 	    return connectionRequest || XPMobileSDK.interfaces.ConnectionRequest;
 	}
+
+	/**
+	 * Sends a LogIn connection command to log a user with valid idpClientId, identityToken, accessToken and RefreshToken.
+	 * The changes of the login status are propagated to all listeners through the ConnectionObserver interface methods.
+	 * Listeners implementing the ConnectionObserver interface methods are added with the addObserver method.
+	 * 
+	 * @method login
+	 * @param {String} idpClientId  - idpClientId
+	 * @param {String} identityToken  - identityToken
+	 * @param {String} accessToken  - accessToken
+	 * @param {String} RefreshToken  - RefreshToken
+	 * @param {String} loginType - loginType
+	 * @param {Object} parameters - other parameters. May contain:
+	 * <pre>
+	 * 
+	 * - {Number} NumChallenges - Number of challenges the MoS should return.
+	 *                           Up to 100 can be requested at once.
+	 * - {String} ProcessingMessage - (optional) [Yes/No] Indicates whether processing messages
+	 *                                should be sent from server while processing the request. Default is Yes.
+	 * - {String} SupportsResampling - (optional) [Yes/No] When present and equal to
+	 *                                 "Yes", indicates that the client can handle
+	 *                                 downsized images. This instructs Quality of
+	 *                                 Service to reduce the size of the sent images
+	 *                                 as additional measure in cases of low bandwidth.
+	 * - {String} SupportsExtendedResamplingFactor - (optional) [Yes/No] When present and equal to
+	 *                                               "Yes", indicates that client supports working
+	 *                                               with decimal resampling factor. Influence on
+	 *                                               the type of ResamplingTag received in Header
+	 *                                               Extension Flags of Video frame
+	 * 
+	 * </pre>
+	 * 
+	 * @return {ConnectionRequest} - the ConnectionRequest object
+	 */
+	function externalLogin(idpClientId, identityToken, accessToken, refreshToken, loginType, parameters) {
+
+		parameters = parameters || {};
+		parameters.IdpClientId = idpClientId;
+		parameters.IdentityToken = identityToken;
+		parameters.AccessToken = accessToken;
+		parameters.RefreshToken = refreshToken;
+		parameters.LoginType = loginType;
+
+		return new ExternalLogin(parameters);
+	}
+
+	/**
+	 * Sends a low level Login command to the server.
+	 *
+	 * @method ExternalLogin
+	 * @param {Object} params - Parameters to sent to the server.  May contain:
+	 * <pre>
+	 * - {String} IdpClientId  - Name of the client IDP
+	 * - {String} IdentityToken  - Identity toke  provider from 3rd party login
+	 * - {String} AccessToken   - Access token  provider from 3rd party login
+	 * - {String} RefreshToken   - Refresh token provider from 3rd party login
+	 * - {String} LoginType - Authentication login type.
+	 * - {Number} NumChallenges - Number of challenges the MoS should return.
+	 *                           Up to 100 can be requested at once.
+	 * - {String} ProcessingMessage - (optional) [Yes/No] Indicates whether processing messages
+	 *                                should be sent from server while processing the request. Default is Yes.
+	 * - {String} SupportsResampling - (optional) [Yes/No] When present and equal to
+	 *                                 "Yes", indicates that the client can handle
+	 *                                 downsized images. This instructs Quality of
+	 *                                 Service to reduce the size of the sent images
+	 *                                 as additional measure in cases of low bandwidth.
+	 * - {String} SupportsExtendedResamplingFactor - (optional) [Yes/No] When present and equal to
+	 *                                               "Yes", indicates that client supports working
+	 *                                               with decimal resampling factor. Influence on
+	 *                                               the type of ResamplingTag received in Header
+	 *                                               Extension Flags of Video frame
+	 * </pre>
+	 * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
+	 * @param {Function} failCallback - function that is called when the command execution has failed and the error is passed as a parameter.
+	 *
+	 * @return {ConnectionRequest} - the ConnectionRequest object
+	 */
+	function ExternalLogin(params, successCallback, failCallback) {
+		if (XPMobileSDKSettings.supportsCHAP && XPMobileSDK.library.Connection.CHAPSupported == 'Yes') {
+			// Take 100 challenges to start with
+			params.NumChallenges = params.NumChallenges || 100;
+		}
+
+		params.SupportsResampling = params.SupportsResampling || 'Yes';
+		params.SupportsExtendedResamplingFactor = params.SupportsExtendedResamplingFactor || 'Yes';
+
+		if (XPMobileSDKSettings.supportsCarousels) {
+			params.SupportsCarousel = params.SupportsCarousel || 'Yes';
+		}
+		if (XPMobileSDKSettings.clientType) {
+			params.ClientType = params.ClientType || XPMobileSDKSettings.clientType;
+		}
+		var connectionRequest = XPMobileSDK.library.Connection.Login(params, successCallback, failCallback);
+		return connectionRequest || XPMobileSDK.interfaces.ConnectionRequest;
+	}
 	
 	/**
 	 * Sends a RequestSecondStepAuthenticationPin connection command after successful login with a valid username and password.
@@ -576,6 +675,19 @@ var XPMobileSDK = new function () {
 	 */
 	function getAllViews(successCallback, errorCallback) {
 		var connectionRequest = XPMobileSDK.library.Connection.getAllViews(successCallback, errorCallback);
+		return connectionRequest || XPMobileSDK.interfaces.ConnectionRequest;
+	}
+
+	/**
+	 *
+	 * @method getAllCameras
+	 * @param {Function} successCallback - function that is called when the command execution was successful and a camera object is passed as a parameter.
+	 * @param {Function} errorCallback - function that is called when the command execution has failed and an error object is passed as a parameter.
+	 *
+	 * @return {ConnectionRequest} - the ConnectionRequest object
+	 */
+	function getAllCameras(successCallback, errorCallback) {
+		var connectionRequest = XPMobileSDK.library.Connection.getAllCameras(successCallback, errorCallback);
 		return connectionRequest || XPMobileSDK.interfaces.ConnectionRequest;
 	}
 
