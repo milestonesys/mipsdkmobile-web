@@ -217,7 +217,7 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 	* @param CommandNode the Command tag.
 	*/
 	function parseSequences(CommandNode) {
-
+		
 		var rootNode = CommandNode.getElementsByTagName('Sequences');
 
 		if (rootNode.length > 0) {
@@ -226,9 +226,9 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 			var sequencesNodes = rootNode[0].getElementsByTagName("Sequence");
 
 			for (var i = 0; i < sequencesNodes.length; i++) {
-
+				
 				var sequence = attributesToObject(sequencesNodes[i], {
-					dates: ['StartTime', 'EndTime']
+					dates: ['StartTime', 'EndTime', 'TimeStamp']
 				});
 
 				self.sequences.push(sequence);
@@ -364,7 +364,7 @@ XPMobileSDK.library.ConnectionResponse = function (xmlString) {
 			var attribute = node.attributes[i];
 
 			if (options && options.numbers && options.numbers.indexOf(attribute.name) != -1) {
-				result[attribute.name] = parseInt(attribute.value);
+				result[attribute.name] = Number(attribute.value);
 			} else if (options && options.dates && options.dates.indexOf(attribute.name) != -1) {
 				result[attribute.name] = new Date(parseInt(attribute.value));
 			} else {
