@@ -124,7 +124,7 @@ class VideoStream extends HTMLElement {
             this.stream.onResize = this.onResize.bind(this);
             this.stream.onPlayerStarted = this.onPlayerStarted.bind(this);
             this.stream.onStreamReady = this.onStreamReady.bind(this);
-            this.stream.onRestartStream = this.restartStream.bind(this);
+            this.stream.onRestartStream = this.onRestartStream.bind(this);
             this.stream.onStartVideoStuck = this.onBeginVideoStuck.bind(this);
             this.stream.onClearVideoStuck = this.onEndVideoStuck.bind(this);
             this.stream.onChangeStreamDataType = this.onChangeStreamDataType.bind(this);
@@ -175,9 +175,9 @@ class VideoStream extends HTMLElement {
         this.dispatchEvent(new CustomEvent('playerStarted', { detail: { cameraId: this.cameraId,videoId: videoId}}));
     }
 
-    onRestartStream(videoConnection) {
-        this.videoStuck = false;
-        this.dispatchEvent(new CustomEvent('restartStream', { connection: videoConnection }));
+    onRestartStream() {
+        const connection = this.restartStream();
+        this.dispatchEvent(new CustomEvent('restartStream', { connection }));
     }
 
     restartStream() {
@@ -185,14 +185,23 @@ class VideoStream extends HTMLElement {
             clearTimeout(this.containerResizeTimeout);
             this.containerResizeTimeout = null;
         }
-        
+
         this.numberOfStreamRestarts++;
         this.videoStuck = false;
-        let videoConnection = this.stream.videoConnection;
-        this.stream && this.stream.destroy(true);
+        const videoConnection = this.stream.videoConnection;
+        const keepConnection = videoConnection && !videoConnection.isClosed && navigator.onLine;
+
+        if (keepConnection) {
+            videoConnection.refresh();
+        } else if (videoConnection) {
+            videoConnection.close();
+        }
+
+        this.stream && this.stream.destroy(keepConnection);
         this.stream = null;
 
-        this.startStream(navigator.onLine ? videoConnection : null);
+        const connection = keepConnection ? videoConnection : null;
+        this.startStream(connection);
         
         if (this.clearNumberOfRestarts) {
             clearTimeout(this.clearNumberOfRestarts);
@@ -202,6 +211,8 @@ class VideoStream extends HTMLElement {
             this.numberOfStreamRestarts = 0;
             this.stream && this.stream.fallbackController && (this.stream.fallbackController.restartCount = 0);
         }, CLEAR_VIDEO_RESTARTS);
+
+        return connection;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

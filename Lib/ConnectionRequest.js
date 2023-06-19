@@ -53,6 +53,7 @@
                 XPMobileSDK.library.Ajax.activeRequestCount--;
             }
 
+            XPMobileSDK.removeObserver(self);
         };
 
         function parseURL(url) {
@@ -86,17 +87,13 @@
         };
 
         function onComplete(response) {
-            if (response.readyState != 4) {
-                return;
-            }
-
-            if (response.status == 200) {
-                return;
-            }
-
-            // Do not flood the server with LiveMessage requests - US#206999
-            if (command == 'LiveMessage' &&
-                (Date.now() - lastLiveMessageRequestTimestamp < XPMobileSDKSettings.liveMessageMinimumInterval)) {
+            if (response.readyState != 4 ||
+                response.status == 200 ||
+                // Do not flood the server with LiveMessage requests - US#206999
+                (command == 'LiveMessage' &&
+                (Date.now() - lastLiveMessageRequestTimestamp < XPMobileSDKSettings.liveMessageMinimumInterval))) {
+ 
+                XPMobileSDK.removeObserver(self);
                 return;
             }
 
@@ -202,6 +199,7 @@
 
         this.connectionDidDisconnect = function () {
             stopRestaringCommands = true;
+            XPMobileSDK.removeObserver(self);
         };
     };
 

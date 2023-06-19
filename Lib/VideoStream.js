@@ -10,10 +10,7 @@ class VideoStream {
 		this.videoConnectionElement.videoId = this.videoId = videoId;
 		this.videoConnectionElement.location = XPMobileSDKSettings.MobileServerURL + XPMobileSDKSettings.videoChanel;
 		this.videoConnectionElement.addEventListener('onReceivedFrame', this.onReceivedFrame.bind(this));
-		let videoConnectionManagerElement = document.getElementsByTagName('videos-video-connection-manager')[0];
-		if (videoConnectionManagerElement) {
-			videoConnectionManagerElement.appendChild(this.videoConnectionElement);
-        }
+		this.videoConnectionElement.addEventListener('onConnectionError', this.onConnectionError.bind(this));	
 
 		this.request = {
 			parameters: connectionRequest.params,
@@ -47,22 +44,26 @@ class VideoStream {
 		this.state = VideoStreamState.new;
 	}
 
+	get isClosed() {
+		return this.state === VideoStreamState.closed;
+	}
+
 	open() {
-		if (this.state === VideoStreamState.closed) {
-			return
+		if (this.isClosed) {
+			return;
         }
 		this.videoConnectionElement.dispatchEvent(new CustomEvent('start'));
-		this.state = VideoStreamState.closed;
+		this.state = VideoStreamState.open;
 	}
 
 	close() {
-		let videoConnectionManagerElement = document.getElementsByTagName('videos-video-connection-manager')[0];
-		if (videoConnectionManagerElement && videoConnectionManagerElement.contains(this.videoConnectionElement)) {
-			videoConnectionManagerElement.removeChild(this.videoConnectionElement);
+		if (this.isClosed) {
+			return;
 		}
+
 		this.videoConnectionElement.dispatchEvent(new CustomEvent('destroy'));
 		XPMobileSDK.closeStream(this.videoId);
-		this.state = VideoStreamState.close;
+		this.state = VideoStreamState.closed;
 	}
 
 	onReceivedFrame(event) {
@@ -74,6 +75,17 @@ class VideoStream {
 			this.close();
 			return;
 		}
+	}
+
+	onConnectionError() {
+		if (!this.isClosed) {
+			this.close();
+			this.callMethodOnObservers('videoConnectionError');
+		}
+	}
+
+	refresh() {
+		this.videoConnectionElement.refresh();
 	}
 
 	/**

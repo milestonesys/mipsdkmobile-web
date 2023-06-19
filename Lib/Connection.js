@@ -2728,15 +2728,14 @@ Connection = function () {
         if (arguments.length < 1) return;
         var methodName = arguments[0];
         var args = Array.prototype.slice.call(arguments, 1);
-        observers.forEach(function (object) {
-            if (object[methodName]) {
-                try {
-                    object[methodName].apply(object, args);
-                } catch (e) {
-                    logger.error(e);
-                    logger.log(e.stack);
-                }
-            }
+
+        observers.filter(observer => observer[methodName]).forEach(function (object) {
+              try {
+                  object[methodName].apply(object, args);
+              } catch (e) {
+                  logger.error(e);
+                  logger.log(e.stack);
+              }
         });
     };
 

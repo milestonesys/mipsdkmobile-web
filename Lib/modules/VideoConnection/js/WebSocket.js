@@ -5,6 +5,13 @@ let socketFailedTimestamp;
 
 const videoStreamRestartMinimumInterval = 20000;
 
+const WebSocketState = {
+    Connecting: 0,
+    Open: 1,
+    Closing: 2,
+    Closed: 3
+};
+
 /**
  * This class is responsible for handling the WebSocket communicatio with mobile server
  * 
@@ -58,8 +65,8 @@ export default class Socket {
         }
 
         this.socket.binaryType = "arraybuffer";
-        this.socket.onerror = (exception) => {
-            this.onSocketError(this.socket);
+        this.socket.onerror = () => {
+            this.onSocketError();
         };
 
         this.socket.onopen = this.onOpen.bind(this);
@@ -76,6 +83,12 @@ export default class Socket {
         }.bind(this);
     }
 
+    pingServer() {
+        if (this.socket && this.socket.readyState === WebSocketState.Open) {
+            this.socket.send('');
+        }
+    }
+
     /**
      * Callback that is fired when the WebSocket is opened.
      */
@@ -84,6 +97,7 @@ export default class Socket {
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onerror = (error) => {
             logger.error('WebSocket error', error);
+            this.onSocketError();
         };
         this.socket.onclose = this.onClose.bind(this);
 
@@ -114,6 +128,8 @@ export default class Socket {
         if (this.videoConnectionState == VideoConnectionState.running) {
             logger.warn("Restarting socket.");
             this.start();
+        } else {
+            this.onSocketClose();
         }
     }
 

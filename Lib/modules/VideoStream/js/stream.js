@@ -16,7 +16,8 @@ const BUFFER_TIME_SECONDS = 10;
 export default class Stream {
     constructor(videoElement, cameraId, height, width, restartCount) {
         this.videoConnectionObserver = {
-            videoConnectionReceivedFrame: this.receivedFragment.bind(this)
+            videoConnectionReceivedFrame: this.receivedFragment.bind(this),
+            videoConnectionError: this.videoConnectionError.bind(this)
         }
 
         this.cameraId = cameraId;
@@ -130,8 +131,6 @@ export default class Stream {
         } else if (window.XPMobileSDK) {
             this.requestStream = XPMobileSDK.requestStream(this.cameraId, destination, parameteres, this.streamReady.bind(this), this.streamError.bind(this));
         }
-
-        this.fallbackController.setWaitingVideoTimeout();
     }
 
     receivedFragment(fragment) {
@@ -180,6 +179,10 @@ export default class Stream {
         if (fragment.hasLiveInformation) {
             this.onLiveEvents(fragment.currentLiveEvents);
         }
+    }
+
+    videoConnectionError() {
+        this.onRestartStream();
     }
 
     getSize(fragment) {
@@ -241,6 +244,7 @@ export default class Stream {
 
         this.onStreamReady(videoConnection);
         this.onStreamReady = function () { };
+        this.fallbackController.setWaitingVideoTimeout();
     }
 
     streamError(error, response) {
@@ -255,10 +259,12 @@ export default class Stream {
     }
 
     destroy(keepVideoConnection) {
-        if (!keepVideoConnection && this.videoConnection) {
+        if (this.videoConnection) {
             this.videoConnection.removeObserver(this.videoConnectionObserver);
-            this.videoConnection.close();
-            this.videoConnection = null;
+            if (!keepVideoConnection) {
+                this.videoConnection.close();
+                this.videoConnection = null;
+            }
         }
 
         if (this.requestStream) {

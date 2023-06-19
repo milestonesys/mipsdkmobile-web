@@ -122,7 +122,7 @@ var AudioControllerPrototype = function (params) {
         this.player.addEventListener("stalled", onStalled, false);
         this.player.addEventListener("playing", onPlaying, false);
 
-        document.addEventListener("onBeforeStartAudio", onBeforeAudioStarts.bind(this));
+        document.addEventListener("onBeforeStartAudio", onBeforeAudioStarts);
     }.bind(this);
 
 
@@ -471,7 +471,7 @@ var AudioControllerPrototype = function (params) {
 
         this.selectAudioSource.removeEventListener('change', audioSourceChanged);
 
-        document.removeEventListener("onBeforeStartAudio", onBeforeAudioStarts.bind(this));
+        document.removeEventListener("onBeforeStartAudio", onBeforeAudioStarts);
     }.bind(this);
 
     initialize();

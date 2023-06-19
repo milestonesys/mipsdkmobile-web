@@ -2,17 +2,22 @@
 import { VideoConnectionState } from './js/config.js';
 
 class VideoConnection extends HTMLElement {
+    #state;
+
     constructor() {
         super();
         this.state = VideoConnectionState.notOpened;
         this.addEventListener('destroy', this.destroy.bind(this));
-        this.addEventListener('start', this.startStream.bind(this));
-        this.frames = [];
-        this.span = 5000;
+        this.addEventListener('start', this.startStream.bind(this));        
+    }
+
+    get state() {
+        return this.#state;
     }
 
     set state(value) {
-        this.socket && this.socket.onStateChange(this.state);
+        this.#state = value;
+        this.socket && this.socket.onStateChange(value);
     }
 
     get videoId() {
@@ -39,18 +44,6 @@ class VideoConnection extends HTMLElement {
         }
     }
 
-    get bps() {
-        return this.getAttribute('bps') || '';
-    }
-
-    set bps(value) {
-        if (value) {
-            this.setAttribute('bps', value);
-        } else {
-            this.removeAttribute('bps');
-        }
-    }
-
     startStream() {
         if (this.status == 'destroyed') {
             return;
@@ -58,22 +51,34 @@ class VideoConnection extends HTMLElement {
         this.socket = new Socket(this.videoId, this.location);
         this.socket.start();
         this.socket.onReceivedFrame = this.onReceivedFrame.bind(this);
+        this.socket.onSocketError = this.onSocketError.bind(this);
+        this.socket.onSocketClose = this.onSocketClose.bind(this);
+    }
+
+    refresh() {
+        if (!this.isClosed) {
+            this.socket.pingServer();
+        }
     }
 
     onReceivedFrame(frame) {
-        this.frames.push({ time: frame.timestamp, size: frame.dataSize });
-        this.dequeueOldFrames(frame.timestamp);
         this.dispatchEvent(new CustomEvent('onReceivedFrame', { detail: { frame: frame } }));
     }
 
-    dequeueOldFrames(dateNow) {
-        while ((this.frames.length > 0) &&
-            ((dateNow - this.frames[0].time) > this.span || (dateNow - this.frames[0].time) < 0)) {
-            this.frames.shift();
+    onSocketError() {
+        if (!this.isClosed) {
+            this.dispatchEvent(new CustomEvent('onConnectionError'));   
         }
-        if (parseInt(dateNow.getTime() / 1000) % 10 == 0) {
-            this.bps = this.frames.reduce((a, b) => a + b.size, 0);
-        }
+    }
+
+    onSocketClose() {
+        if (!this.isClosed) {
+            this.dispatchEvent(new CustomEvent('onConnectionError'));
+        }  
+    }
+
+    get isClosed() {
+        return this.state === VideoConnectionState.closed;
     }
 
     destroy() {
