@@ -38,7 +38,8 @@
 
         var options = {
             AudioSamplingRate: sampleRate || 8000,
-            AudioBitsPerSample: 16
+            AudioBitsPerSample: 16,
+            timeout: 5000
         };
 
         streamRequest = XPMobileSDK.requestAudioStreamIn(itemIds, options, streamRequestCallback, streamRequestErrorCallback);

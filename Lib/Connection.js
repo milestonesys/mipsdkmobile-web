@@ -168,6 +168,12 @@ Connection = function () {
     this.currentUserName = null;
 
     /**
+     * Keeps the email provided by the server of the currently logged in user
+     * @property {String} currentUserEmail
+     */
+    this.currentUserEmail = null;
+
+    /**
      * Session timeout in seconds, supplied by the server. It is needed so we know how often to send keep-alive messages
      * @property {Number} serverTimeout
      */
@@ -388,7 +394,6 @@ Connection = function () {
 
     };
 
-
     /**
      * Sends a Login command to the server. Log-in has to be performed before any other normal requests (except connect and some other special cases). 
      * 
@@ -430,8 +435,6 @@ Connection = function () {
 
     var proceedWithLogin = function (connectionResponse, successCallback) {
 
-        var oldServerVersion = XPMobileSDK.features && XPMobileSDK.features.ServerVersion;
-
         self.directStreamingServer = connectionResponse.outputParameters.DirectStreamingLive === 'Yes';
         self.storage.setItem('directStreamingServer', self.directStreamingServer);
 
@@ -447,16 +450,16 @@ Connection = function () {
             self.currentUserName = connectionResponse.outputParameters.Username;
         }
 
+        if (connectionResponse.outputParameters.Email) {
+            self.currentUserEmail = connectionResponse.outputParameters.Email;
+        }
+
         logger.info('Logged in');
         getFeatures(connectionResponse.outputParameters);
 
         setState(XPMobileSDK.library.ConnectionStates.working);
         callMethodOnObservers('connectionDidLogIn', connectionResponse.outputParameters);
         successCallback && successCallback();
-
-        if (oldServerVersion && oldServerVersion !== XPMobileSDK.features.ServerVersion) {
-            callMethodOnObservers('connectionVersionChanged');
-        }
     };
 
     /**
@@ -622,42 +625,6 @@ Connection = function () {
     */
     var getAllCamerasCallback = function (connectionRequest) {
         callbackAfterRequest(connectionRequest, 'Error executing GetItems on the server.', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
-        });
-    };
-
-    this.getOsmServerAddresses = function (successCallback, failCallback) {
-
-        return self.sendCommand('GetOsmServerAddresses', {}, { successCallback: successCallback }, getOsmServerAddressesCallback, failCallback);
-
-    };
-
-    var getOsmServerAddressesCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error getting OSM server addresses from the server.', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
-        });
-    };
-
-    this.getGisMapCameras = function (successCallback, failCallback) {
-
-        return self.sendCommand('GetGisMapCameras', {}, { successCallback: successCallback }, getGisMapCamerasCallback, failCallback);
-
-    };
-
-    var getGisMapCamerasCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error getting GIS map cameras from the server.', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
-        });
-    };
-
-    this.getGisMapLocations = function (successCallback, failCallback) {
-
-        return self.sendCommand('GetGisMapLocations', {}, { successCallback: successCallback }, getGisMapLocationsCallback, failCallback);
-
-    };
-
-    var getGisMapLocationsCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error getting GIS map cameras from the server.', function () {
             connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
         });
     };
@@ -843,7 +810,8 @@ Connection = function () {
         }
 
         options = {
-            successCallback: successCallback
+            successCallback: successCallback,
+            timeout: options.timeout
         };
 
         return self.sendCommand('RequestAudioStreamIn', params, options, requestAudioStreamInCallback, failCallback);
@@ -1025,9 +993,6 @@ Connection = function () {
 
     var changeStreamCallback = function (connectionRequest) {
         callbackAfterRequest(connectionRequest, 'Error changing stream.', function () {
-            if (XPMobileSDK.features.SupportTimeBetweenFrames) {
-                connectionRequest.VideoConnection.resetCommunication();
-            }
             connectionRequest.options.successCallback && connectionRequest.options.successCallback();
         });
     };
@@ -1619,52 +1584,6 @@ Connection = function () {
     };
 
     /**
-     * Starts a new video export.
-     * 
-     * @method startVideoExport
-     * @param {String} cameraId: indicates the camera this export will be extracted from
-     * @param {Number} startTime: timestamp in UTC, the initial time of the export
-     * @param {Number} endTime: timestamp in UTC, the end time of the export
-     * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
-     */
-    this.startVideoExport = function (cameraId, startTime, endTime, successCallback, failCallback) {
-
-        var params = {
-            CameraId: cameraId,
-            StartTime: startTime,
-            EndTime: endTime,
-            Type: 'Avi'
-        };
-
-        return self.sendCommand('StartExport', params, { successCallback: successCallback }, startExportCallback, failCallback);
-    };
-
-    /**
-     * Restarts an exports that has previously failed. Requires a valid exportId.
-     * 
-     * @method restartErroneousExport
-     * @param {String} exportId: a valid exportId of a previously failed export
-     */
-    this.restartErroneousExport = function (exportId, successCallback, failCallback) {
-
-        var params = {
-            ExportId: exportId
-        };
-
-        return self.sendCommand('StartExport', params, { successCallback: successCallback }, startExportCallback, failCallback);
-    };
-
-    /**
-     * Called after startVideoExport response is returned.
-     */
-    var startExportCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error starting export.', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.outputParameters.ExportId);
-        });
-    };
-
-    /**
      * Gets the exports for the currently logged user.
      *
      * @method getUserExports
@@ -1777,32 +1696,6 @@ Connection = function () {
     };
 
     /**
-     * Deletes an export by id. 
-     * 
-     * @method deleteExport
-     * @param {String} id: the unique id of the export.
-     * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
-     */
-    this.deleteExport = function (id, successCallback, failCallback) {
-
-        var params = {
-            ExportId: id
-        };
-
-        return self.sendCommand('DeleteExport', params, { successCallback: successCallback }, deleteExportCallback, failCallback);
-    };
-
-    /**
-     * Called after deleteExport response is returned.
-     */
-    var deleteExportCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error deleting export.', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback();
-        });
-    };
-
-    /**
      * Sends a GetOutputsAndEvents command to the server. 
      * 
      * @method getOutputsAndEvents
@@ -1899,50 +1792,6 @@ Connection = function () {
      */
     var getCameraCapabilitiesCallback = function (connectionRequest) {
         callbackAfterRequest(connectionRequest, 'Error getting camera capabilities', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.outputParameters);
-        });
-    };
-
-    /**
-     * Asks server to prepare URL for uploading.
-     * 
-     * @param {Object} params: Parameters to sent to the server
-     * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
-     */
-    this.prepareUpload = function (params, successCallback, failCallback) {
-        return self.sendCommand('PrepareUpload', params, { successCallback: successCallback }, prepareUploadCallback, failCallback);
-    };
-
-    /**
-     * Called after prepareUpload command is executed
-     * 
-     * @param 		connectionRequest		object		Response from AXAJ call
-     */
-    var prepareUploadCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error preparing upload', function () {
-            connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.outputParameters);
-        });
-    };
-
-    /**
-     * Get the status of the upload by given UploadID
-     * 
-     * @param {Object} params: Parameters to sent to the server
-     * @param {Function} successCallback: function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} failCallback: function that is called when the command execution has failed and the error is passed as a parameter.
-     */
-    this.getUploadStatus = function (params, successCallback, failCallback) {
-        return self.sendCommand('GetUploadStatus', params, { successCallback: successCallback }, getUploadStatusCallback, failCallback);
-    };
-
-    /**
-     * Called after getUploadStatus command is executed
-     * 
-     * @param 		connectionRequest		object		Response from AXAJ call
-     */
-    var getUploadStatusCallback = function (connectionRequest) {
-        callbackAfterRequest(connectionRequest, 'Error getting upload status', function () {
             connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.outputParameters);
         });
     };
@@ -2175,7 +2024,6 @@ Connection = function () {
     this.cancelInvestigation = function (investigationId) {
         return self.sendCommand('CancelInvestigationUpdate', { ItemId: investigationId }, null, cancelInvestigationCallback);
     };
-
 
     /**
      * Called when CancelInvestigationUpdate reposne is received
@@ -2561,7 +2409,6 @@ Connection = function () {
         callbackAfterRequest(connectionRequest, 'Error resuming carousel');
     };
 
-
     this.registerForNotifications = function (setting, successCallback, failCallback) {
         var browser = $.getBrowser();
         var deviceName = browser.name + " " + browser.version + ", " + browser.os;
@@ -2612,7 +2459,6 @@ Connection = function () {
             connectionRequest.options.successCallback && connectionRequest.options.successCallback(connectionRequest.response.items);
         });
     };
-
 
     /**
      * A general callback to be called after a request operation. 
@@ -2903,9 +2749,6 @@ Connection = function () {
             switch (i) {
                 case 'Challenge':
                     data['CHAPSupported'] = true;
-                    break;
-                case 'ServerVersion':
-                    data['ServerVersion'] = features[i];
                     break;
                 case 'ServerType':
                     XPMobileSDKSettings.ServerType = features[i];

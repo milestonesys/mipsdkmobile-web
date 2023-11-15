@@ -81,7 +81,8 @@
                 postBody: requestXML,
                 onSuccess: onSuccess,
                 onComplete: onComplete,
-                onFailure: self.options.failCallback || function () { parseResponse(); }
+                onFailure: self.options.failCallback || function () { parseResponse(); },
+                timeout: options.timeout
             });
 
         };
@@ -96,7 +97,6 @@
                 XPMobileSDK.removeObserver(self);
                 return;
             }
-
             restartHighPriorityCommand();
         }
 

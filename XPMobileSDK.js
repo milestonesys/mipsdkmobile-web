@@ -139,9 +139,6 @@ var XPMobileSDK = new function () {
     this.CloseStream = CloseStream;
     this.createVideoPushConnection = createVideoPushConnection;
     this.createAudioPushConnection = createAudioPushConnection;
-    this.getOsmServerAddresses = getOsmServerAddresses;
-    this.getGisMapCameras = getGisMapCameras;
-    this.getGisMapLocations = getGisMapLocations;
     this.motionDetection = motionDetection;
     this.getPtzPresets = getPtzPresets;
     this.ptzPreset = ptzPreset;
@@ -158,19 +155,14 @@ var XPMobileSDK = new function () {
     this.getPrevSequence = getPrevSequence;
     this.getSequencesInInterval = getSequencesInInterval;
     this.getSequencesForView = getSequencesForView;
-    this.startVideoExport = startVideoExport;
-    this.restartErroneousExport = restartErroneousExport;
     this.getUserExports = getUserExports;
     this.getAllExports = getAllExports;
     this.getExport = getExport;
     this.createExportDownloadLink = createExportDownloadLink;
-    this.deleteExport = deleteExport;
     this.getOutputsAndEvents = getOutputsAndEvents;
     this.getServerStatus = getServerStatus;
     this.triggerOutputOrEvent = triggerOutputOrEvent;
     this.getCameraCapabilities = getCameraCapabilities;
-    this.prepareUpload = prepareUpload;
-    this.getUploadStatus = getUploadStatus;
     this.requestChallenges = requestChallenges;
     this.createPlaybackController = createPlaybackController;
     this.changeMultipleStreams = changeMultipleStreams;
@@ -1036,45 +1028,6 @@ var XPMobileSDK = new function () {
     }
 
     /**
-     * Returns the Open Street Map servers defined into Mobile Server's config file
-     * 
-     * @method getOsmServerAddresses
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and an error object is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function getOsmServerAddresses(successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.getOsmServerAddresses(successCallback, errorCallback);
-    }
-
-    /**
-     * Returns the all Smart Maps cameras
-     * 
-     * @method getGisMapCameras
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and an error object is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function getGisMapCameras(successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.getGisMapCameras(successCallback, errorCallback);
-    }
-
-    /**
-     * Returns the all Smart Maps locations
-     * 
-     * @method getGisMapLocations
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and an error object is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function getGisMapLocations(successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.getGisMapLocations(successCallback, errorCallback);
-    }
-
-    /**
      * Sends a ChangeStream command to the server. 
      * Changes the motion detection settings of the stream that the given videoConnection represents.
      * 
@@ -1336,36 +1289,6 @@ var XPMobileSDK = new function () {
     }
 
     /**
-     * Starts a new video export.
-     * 
-     * @method startVideoExport
-     * @param {String} cameraId - GUID of the camera
-     * @param {Number} startTime - timestamp in UTC, the initial time of the export
-     * @param {Number} endTime - timestamp in UTC, the end time of the export
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function startVideoExport(cameraId, startTime, endTime, successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.startVideoExport(cameraId, startTime, endTime, successCallback, errorCallback);
-    }
-
-    /**
-     * Restarts an exports that has previously failed. Requires a valid exportId.
-     * 
-     * @method restartErroneousExport
-     * @param {String} exportId - a valid exportId of a previously failed export
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function restartErroneousExport(exportId, successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.restartErroneousExport(exportId, successCallback, errorCallback);
-    }
-
-    /**
      * Gets the exports for the currently logged user.
      *
      * @method getUserExports
@@ -1419,20 +1342,6 @@ var XPMobileSDK = new function () {
      */
     function createExportDownloadLink(exportId, investigationId, exportType, successCallback, errorCallback) {
         return XPMobileSDK.library.Connection.createExportDownloadLink(exportId, investigationId, exportType, successCallback, errorCallback);
-    }
-
-    /**
-     * Deletes an export by id. 
-     * 
-     * @method deleteExport
-     * @param {String} id - ID of the export to delete (GUID).
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function deleteExport(id, successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.deleteExport(id, successCallback, errorCallback);
     }
 
     /**
@@ -1490,42 +1399,7 @@ var XPMobileSDK = new function () {
         return XPMobileSDK.library.Connection.getCameraCapabilities(cameraId, successCallback, errorCallback);
     }
 
-    /**
-     * Prepare server for uploading a file. Asks server to prepare URL for uploading. 
-     * 
-     * @method prepareUpload
-     * @param {Object} parameters - Object containing the following properties:
-     * <pre>
-     * - {String} UploadType - Type of the upload - File, Stream etc.
-     * - {String} FileType - The type of the file that needs to be uploaded - License, Image etc.
-     * </pre>
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function prepareUpload(parameters, successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.prepareUpload(parameters, successCallback, errorCallback);
-    }
-
-    /**
-     * Get the status of the upload by given UploadID
-     * 
-     * @method getUploadStatus
-     * @param {Object} parameters - Object containing the following properties:
-     * <pre>
-     * - {String} UploadID - Upload ID retrieved from PrepareUpload command.
-     * </pre>
-     * @param {Function} successCallback - function that is called when the command execution was successful and the result is passed as a parameter.
-     * @param {Function} errorCallback - function that is called when the command execution has failed and the error is passed as a parameter.
-     * 
-     * @return {ConnectionRequest} - the ConnectionRequest object
-     */
-    function getUploadStatus(parameters, successCallback, errorCallback) {
-        return XPMobileSDK.library.Connection.getUploadStatus(parameters, successCallback, errorCallback);
-    }
-
-    /**
+     /**
      * Get new challenges from server
      * 
      * @method requestChallenges
