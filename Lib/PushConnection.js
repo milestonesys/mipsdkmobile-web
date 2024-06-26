@@ -131,7 +131,6 @@ XPMobileSDK.library.PushConnection = function (videoURL, options) {
     var onMessage = function (event) {
 
         if (lastFrame) {
-            delete lastFrame;
             lastFrame = null;
         }
 
