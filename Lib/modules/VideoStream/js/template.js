@@ -1,7 +1,7 @@
 ﻿export default class Template {
-    constructor(name) {
-        this.template = document.createElement('template');
-        this.template.innerHTML = `
+  constructor(name) {
+    this.template = document.createElement("template");
+    this.template.innerHTML = `
             <style>
                 .camera {
                     width: 100%;
@@ -19,9 +19,9 @@
                 </div>
             </div>
         `;
-    }
+  }
 
-    get() {
-        return this.template;
-    }
+  get() {
+    return this.template;
+  }
 }

@@ -1,136 +1,150 @@
 (function (undefined) {
-    var VideoPushController = function () {
-        var self = this;
+  var VideoPushController = function () {
+    var self = this;
 
-        self.container;
-        self.isVideoPushConnectionCreated = false;
-        self.canvas;
-        self.canvasContext;
-        self.videoPushConnection;
-        self.pushInterval;
-        self.isPushing = false;
+    self.container;
+    self.isVideoPushConnectionCreated = false;
+    self.canvas;
+    self.canvasContext;
+    self.videoPushConnection;
+    self.pushInterval;
+    self.isPushing = false;
 
-        function pushFrameToServer() {
-            if (!self.isPushing) {
-                return;
-            }
+    function pushFrameToServer() {
+      if (!self.isPushing) {
+        return;
+      }
 
-            // Push frame to server
-            self.videoPushConnection.send(self.canvas.toDataURL('image/jpeg', 0.9));
-        }
+      // Push frame to server
+      self.videoPushConnection.send(self.canvas.toDataURL("image/jpeg", 0.9));
+    }
 
-        function initializeSourceCanvas() {
-            /*
+    function initializeSourceCanvas() {
+      /*
                 THIS METHOD IS JUST FOR DEMO PURPOSES
                 THE CANVAS SOURCE CAN BE TAKEN FROM ANYTHING ELSE YOU WANT TO STREAM 
             */
 
-            var r = 255,
-                g = 255,
-                b = 255,
-                i = 0;
+      var r = 255,
+        g = 255,
+        b = 255,
+        i = 0;
 
-            self.canvasContext.font = '30px Arial';
+      self.canvasContext.font = "30px Arial";
 
-            self.pushInterval = setInterval(function () {
-                r = Math.round(Math.random() * 255);
-                g = Math.round(Math.random() * 255);
-                b = Math.round(Math.random() * 255);
+      self.pushInterval = setInterval(function () {
+        r = Math.round(Math.random() * 255);
+        g = Math.round(Math.random() * 255);
+        b = Math.round(Math.random() * 255);
 
-                self.canvasContext.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
-                self.canvasContext.fillRect(0, 0, self.canvas.width, self.canvas.height);
+        self.canvasContext.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        self.canvasContext.fillRect(
+          0,
+          0,
+          self.canvas.width,
+          self.canvas.height,
+        );
 
-                self.canvasContext.fillStyle = 'rgb(' + (255 - r) + ',' + (255 - g) + ',' + (255 - b) + ')';
-                self.canvasContext.fillText('Frame ' + i, 20, 50);
+        self.canvasContext.fillStyle =
+          "rgb(" + (255 - r) + "," + (255 - g) + "," + (255 - b) + ")";
+        self.canvasContext.fillText("Frame " + i, 20, 50);
 
-                i++;
+        i++;
 
-                if (i > 999) {
-                    i = 0;
-                }
-
-                pushFrameToServer();
-            }, 1000);
+        if (i > 999) {
+          i = 0;
         }
 
-        function toggleVideoPush() {
-            if (self.isPushing) {
-                self.isPushing = false;
+        pushFrameToServer();
+      }, 1000);
+    }
 
-                clearInterval(self.pushInterval);
+    function toggleVideoPush() {
+      if (self.isPushing) {
+        self.isPushing = false;
 
-                // Close video push connection
-                // Open video push connection
-                self.videoPushConnection.close();
-            }
-            else {
-                initializeSourceCanvas();
+        clearInterval(self.pushInterval);
 
-                // Open video push connection
-                self.videoPushConnection.open(function () {
-                    self.isPushing = true;
-                }, function (error) {
-                    console.error(error);
-                });
-            }
-        }
+        // Close video push connection
+        // Open video push connection
+        self.videoPushConnection.close();
+      } else {
+        initializeSourceCanvas();
 
-        function createVideoPush() {
-            if (self.isVideoPushConnectionCreated) {
-                return;
-            }
+        // Open video push connection
+        self.videoPushConnection.open(
+          function () {
+            self.isPushing = true;
+          },
+          function (error) {
+            console.error(error);
+          },
+        );
+      }
+    }
 
-            self.isVideoPushConnectionCreated = true;
+    function createVideoPush() {
+      if (self.isVideoPushConnectionCreated) {
+        return;
+      }
 
-            self.canvas = document.getElementById('push-canvas');
-            self.canvasContext = self.canvas.getContext('2d');
+      self.isVideoPushConnectionCreated = true;
 
-            // Initialize video push connection
-            XPMobileSDK.createVideoPushConnection(function (videoPushConnection) {
-                var togglePushButton = document.getElementById('toggle-video-push-button');
-                
-                self.videoPushConnection = videoPushConnection;
+      self.canvas = document.getElementById("push-canvas");
+      self.canvasContext = self.canvas.getContext("2d");
 
-                togglePushButton.style.display = 'block';
-                togglePushButton.addEventListener('click', toggleVideoPush);
-            }, function () { }, true);
-        }
+      // Initialize video push connection
+      XPMobileSDK.createVideoPushConnection(
+        function (videoPushConnection) {
+          var togglePushButton = document.getElementById(
+            "toggle-video-push-button",
+          );
 
-        function init(event) {
-            self.container = event.detail.cameraContainer;
+          self.videoPushConnection = videoPushConnection;
 
-            self.container.addEventListener('playStream', createVideoPush);
-        }
+          togglePushButton.style.display = "block";
+          togglePushButton.addEventListener("click", toggleVideoPush);
+        },
+        function () {},
+        true,
+      );
+    }
 
-        return {
-            init: init
-        };
+    function init(event) {
+      self.container = event.detail.cameraContainer;
+
+      self.container.addEventListener("playStream", createVideoPush);
+    }
+
+    return {
+      init: init,
     };
+  };
 
-    var connectionDidLogIn = function () {
-        // Check if VideoPush is enabled
-        if (!XPMobileSDK.features.VideoPush) {
-            alert('VideoPush is false!');
+  var connectionDidLogIn = function () {
+    // Check if VideoPush is enabled
+    if (!XPMobileSDK.features.VideoPush) {
+      alert("VideoPush is false!");
 
-            return;
-        }
+      return;
+    }
 
-        var container = document.getElementById('streams-container');
+    var container = document.getElementById("streams-container");
 
-        container.addEventListener('cameraElementAdded', function (event) {
-            var videoPush = new VideoPushController();
+    container.addEventListener("cameraElementAdded", function (event) {
+      var videoPush = new VideoPushController();
 
-            videoPush.init(event);
-        });
-
-        Application.connectionDidLogIn(container);
-    };
-
-    window.addEventListener('load', function () {
-        var params = {
-            connectionDidLogIn: connectionDidLogIn
-        };
-
-        LoginManager.loadAndLogin(params);
+      videoPush.init(event);
     });
+
+    Application.connectionDidLogIn(container);
+  };
+
+  window.addEventListener("load", function () {
+    var params = {
+      connectionDidLogIn: connectionDidLogIn,
+    };
+
+    LoginManager.loadAndLogin(params);
+  });
 })();

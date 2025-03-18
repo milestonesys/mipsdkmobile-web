@@ -1,44 +1,50 @@
 class AudioAvailability {
+  static mimecodec = "audio/mpeg";
 
-    static mimecodec = "audio/mpeg";
+  static isOutgoingAudioNotSupported() {
+    var notSupported =
+      !XPMobileSDKSettings.SupportsAudioIn ||
+      !XPMobileSDK.features.SupportsOutgoingAudio;
 
-    static isOutgoingAudioNotSupported() {
-        var notSupported = !XPMobileSDKSettings.SupportsAudioIn ||
-            !XPMobileSDK.features.SupportsOutgoingAudio;
+    return notSupported;
+  }
 
-        return notSupported;
-    };
+  static isOutgoingPTTAudioNotSupported() {
+    var notSupported =
+      !XPMobileSDKSettings.SupportsAudioIn ||
+      !XPMobileSDK.features.SupportsOutgoingPTTAudio;
 
-    static isOutgoingPTTAudioNotSupported() {
-        var notSupported = !XPMobileSDKSettings.SupportsAudioIn || !XPMobileSDK.features.SupportsOutgoingPTTAudio;
+    return notSupported;
+  }
 
-        return notSupported;
-    };
+  static isLiveFeatureNotSupported() {
+    return AudioAvailability.isOutgoingAudioNotSupported();
+  }
 
-    static isLiveFeatureNotSupported() {
-        return AudioAvailability.isOutgoingAudioNotSupported();
-    };
+  static isPlaybackFeatureNotSupported() {
+    return (
+      AudioAvailability.isOutgoingAudioNotSupported() &&
+      AudioAvailability.isOutgoingPTTAudioNotSupported()
+    );
+  }
 
-    static isPlaybackFeatureNotSupported() {
-        return AudioAvailability.isOutgoingAudioNotSupported() && AudioAvailability.isOutgoingPTTAudioNotSupported();
-    };
+  static noAvailableMics(microphones) {
+    var notSupported =
+      AudioAvailability.isOutgoingAudioNotSupported() ||
+      !microphones ||
+      !microphones.length;
 
-    static noAvailableMics(microphones) {
+    return notSupported;
+  }
 
-        var notSupported = AudioAvailability.isOutgoingAudioNotSupported() ||
-            !microphones ||
-            !microphones.length;
+  static noAvailableSpeakers(speakers) {
+    var notSupported =
+      AudioAvailability.isOutgoingPTTAudioNotSupported() ||
+      !speakers ||
+      !speakers.length;
 
-        return notSupported;
-    };
-
-    static noAvailableSpeakers(speakers) {
-        var notSupported = AudioAvailability.isOutgoingPTTAudioNotSupported() ||
-            !speakers ||
-            !speakers.length;
-
-        return notSupported;
-    };
+    return notSupported;
+  }
 }
 
 XPMobileSDK.library.AudioAvailability = AudioAvailability;

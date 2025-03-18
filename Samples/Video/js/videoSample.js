@@ -1,15 +1,15 @@
 (function () {
-    window.addEventListener('load', function () {
-        var connectionDidLogIn = function () {
-            var container = document.getElementById('streams-container');
+  window.addEventListener("load", function () {
+    var connectionDidLogIn = function () {
+      var container = document.getElementById("streams-container");
 
-            Application.connectionDidLogIn(container);
-        };
+      Application.connectionDidLogIn(container);
+    };
 
-        var params = {
-            connectionDidLogIn: connectionDidLogIn
-        };
+    var params = {
+      connectionDidLogIn: connectionDidLogIn,
+    };
 
-        LoginManager.loadAndLogin(params);
-    });
+    LoginManager.loadAndLogin(params);
+  });
 })();

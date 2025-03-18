@@ -1,35 +1,38 @@
-; (function (undefined) {
-    var audioParser = function (data) {
-        var self = this;
+(function (undefined) {
+  var audioParser = function (data) {
+    var self = this;
 
-        XPMobileSDK.library.ItemHeaderParser.call(self, data);
+    XPMobileSDK.library.ItemHeaderParser.call(self, data);
 
-        /**
-         * Parse audio frame headers
-         */
-        function parseAudioHeader() {
-            self.uuid = self.getGUID();
-            
-            self.skipBytes(18);
+    /**
+     * Parse audio frame headers
+     */
+    function parseAudioHeader() {
+      self.uuid = self.getGUID();
 
-            var mainHeader = self.readBytes(2);
+      self.skipBytes(18);
 
-            self.skipBytes(4);
+      var mainHeader = self.readBytes(2);
 
-            if (mainHeader & XPMobileSDK.library.ItemHeaderParser.HeaderExtensionDynamicInfo) {
-                self.parseDynamicInformation();
-            }
-        };
+      self.skipBytes(4);
 
-        /**
-         * Initialize the prototype
-         */
-        function initialize() {
-            parseAudioHeader();
-        }
+      if (
+        mainHeader &
+        XPMobileSDK.library.ItemHeaderParser.HeaderExtensionDynamicInfo
+      ) {
+        self.parseDynamicInformation();
+      }
+    }
 
-        initialize();
-    };
+    /**
+     * Initialize the prototype
+     */
+    function initialize() {
+      parseAudioHeader();
+    }
 
-    XPMobileSDK.library.AudioHeaderParser = audioParser;
+    initialize();
+  };
+
+  XPMobileSDK.library.AudioHeaderParser = audioParser;
 })();

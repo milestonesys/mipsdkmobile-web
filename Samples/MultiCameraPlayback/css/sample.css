@@ -1,12 +1,12 @@
 body {
-    padding-top: 70px;
+  padding-top: 70px;
 }
 
 .topbar {
-    position: absolute;
-    top: 10px;
+  position: absolute;
+  top: 10px;
 }
 
 .bottombar .playbackBarButtons .playBackButton {
-    display: inline-block;
+  display: inline-block;
 }

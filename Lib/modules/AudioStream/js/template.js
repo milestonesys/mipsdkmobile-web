@@ -1,8 +1,8 @@
 ﻿export default class Template {
-    constructor() {
-        this.template = document.createElement('template');
+  constructor() {
+    this.template = document.createElement("template");
 
-        this.template.innerHTML = `
+    this.template.innerHTML = `
             <style>
                 .shadowWrapper {
                     display: flex;
@@ -88,9 +88,9 @@
                     <div id="audioButton" part="audioButton" class="btn featureDisabled disabled"></div>
                 </div>
         `;
-    }
+  }
 
-    get() {
-        return this.template;
-    }
+  get() {
+    return this.template;
+  }
 }
