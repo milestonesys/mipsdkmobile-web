@@ -197,7 +197,7 @@
 
       stream = newStream;
 
-      audioCtx = AudioCtxFactory.getAudioCtx();
+      audioCtx = new AudioContext();
 
       var bufferSize = 8192; //256, 512, 1024, 2048, 4096, 8192, 16384
 
@@ -329,7 +329,7 @@
       /********** Get sample rate **************/
 
       stream = newStream;
-      audioCtx = AudioCtxFactory.getTestAudioCtx();
+      audioCtx = new AudioContext();
       audioSourceNode = audioCtx.createMediaStreamSource(stream);
       recorder = audioCtx.createScriptProcessor(bufferSize, 1, 1);
 
